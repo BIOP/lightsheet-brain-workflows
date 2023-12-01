@@ -489,7 +489,7 @@ public class GUIGeneration {
                 println(o.toString())
                 if(o == button_select_yaml) {
                     yaml_chooser = new JFileChooser()
-                    yaml_chooser.setCurrentDirectory(new File("D:\\git\\lish_analysis\\lishAnalysis\\src\\main\\resources"))
+                    yaml_chooser.setCurrentDirectory(new File("D:\\git\\lish_analysis\\LightSheet_brain_analysis\\src\\main\\resources"))
                     def yamlFilter = new FileNameExtensionFilter("YAML Files (*.yaml, *.yml)", "yaml", "yml")
                     yaml_chooser.fileFilter = yamlFilter
 
@@ -702,7 +702,7 @@ public class GUIGeneration {
                     edited_yaml_parameters.fusion_parameters.fused_image = fused_image.getText()
                     edited_yaml_parameters.fusion_parameters.filename_addition = filename_addition.getText()
 
-                    om.writeValue(new File("D:\\git\\lish_analysis\\lishAnalysis\\src\\main\\resources\\processing_parameters.yml"), edited_yaml_parameters)
+                    om.writeValue(new File("D:\\git\\lish_analysis\\LightSheet_brain_analysis\\src\\main\\resources\\processing_parameters.yml"), edited_yaml_parameters)
                 } else if(o == button_cancel) {
                     System.exit(0)
                 }

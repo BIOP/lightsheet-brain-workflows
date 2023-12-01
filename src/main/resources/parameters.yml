@@ -5,6 +5,7 @@ global_variables:
   - "Lana"
   - "Carl"
   - "Lorenzo"
+  - "Remy"
 general_parameters:
   user: "Olivier"
   input_path: "Hello"
