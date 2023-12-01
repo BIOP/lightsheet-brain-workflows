@@ -1,0 +1,58 @@
+---
+global_variables:
+  user_list:
+  - "Axel"
+  - "Lana"
+  - "Carl"
+  - "Lorenzo"
+general_parameters:
+  user: "Axel"
+  input_path: "Hello"
+  output_dir: "World"
+  parent_yaml_parameter_file: "D:\\git\\lish_analysis\\lishAnalysis\\src\\main\\resources\\\
+    parameters.yml"
+  save_2D: false
+  save_3D: true
+  preprocessing: true
+  atlas_registration: false
+  brain_orientation:
+  - "RAS"
+  downsampling: "1"
+resaving_parameters:
+  subsampling_factors:
+  - "{1, 1, 1}"
+  - "{2, 2, 1}"
+  - "{4, 4, 2}"
+  - "{8, 8, 4}"
+  - "{16, 16, 8}"
+  hdf5_chunk_sizes:
+  - "{32, 32, 32}"
+  - "{32, 32, 32}"
+  - "{32, 32, 32}"
+  - "{32, 32, 32}"
+  - "{32 ,32, 32}"
+channel_alignment_parameters:
+  pairwise_shifts_downsamples_XYZ:
+  - 2
+  - 2
+  - 1
+  filter_min_r: 0.7
+tile_alignment_parameters:
+  pairwise_shifts_parameters:
+  - "group"
+  - "use Channel 488"
+  - - 4
+    - 4
+    - 2
+  filter_min_r: 0.8
+  optimize_fix_group: "fix_group_0-10"
+icp_refinement_parameters:
+  icp_refinement_type: "Simple (all together)"
+  downsampling: "Downsampling 8/8/4"
+  interest: "Average Threshold"
+  icp_max_error: "Normal Adjusasjkdfhksjdfhtment (<5px)"
+fusion_parameters:
+  preserve_original: "preserve_original"
+  produce: "Each timepoint & channel"
+  fused_image: "Save as (compressed) TIFF stacks"
+  filename_addition: "filename_addition HofofofsAHA"

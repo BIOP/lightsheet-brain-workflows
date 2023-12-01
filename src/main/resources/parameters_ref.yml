@@ -1,0 +1,60 @@
+---
+#-------------Script parameters -----------------#
+general_parameters:
+  user: ""
+  input_path: "Hello" # needs path (can be either czi file or folder)
+  output_dir: "World" # needs path
+  yaml_parameter_file: "" # needs path
+  save_2D: false
+  save_3D: true
+  preprocessing: true
+  atlas_registration: false
+  brain_orientation: ["RAS"] # Add more orientations as an array in order to work in batch mode
+  downsampling: "1"
+
+resaving_parameters:
+  subsampling_factors:
+    - "{1, 1, 1}"
+    - "{2, 2, 1}"
+    - "{4, 4, 2}"
+    - "{8, 8, 4}"
+    - "{16, 16, 8}"
+  hdf5_chunk_sizes:
+    - "{32, 32, 32}"
+    - "{32, 32, 32}"
+    - "{32, 32, 32}"
+    - "{32, 32, 32}"
+    - "{32 ,32, 32}"
+
+channel_alignment_parameters:
+  pairwise_shifts_downsamples_XYZ: [2, 2, 1]
+  filter_min_r: 0.7
+
+tile_alignment_parameters:
+  pairwise_shifts_parameters: 
+    - "group"  #how_to_treat_channels
+    - "use Channel 488" # channels
+    - [4, 4, 2] # downsample in x, y and z
+  filter_min_r: 0.7
+  optimize_fix_group: "fix_group_0-10" #must this be the central group?
+  
+icp_refinement_parameters:
+  icp_refinement_type: "Simple (all together)" #refines on all levels (tiles, channels, illuminations)
+  downsampling: "Downsampling 8/8/4"
+  interest: "Average Threshold"
+  icp_max_error: "Normal Adjustment (<5px)" #(fine, normal, gross)
+
+fusion_parameters:
+  preserve_original: "preserve_original" # text is written no other values required.
+  produce: "Each timepoint & channel"
+  fused_image: "Save as (compressed) TIFF stacks" # also, new XML project
+  filename_addition: "filename_addition"
+
+#-------------Global variables--------------------#
+
+global_variables:
+  user_list:
+    - "Axel"
+    - "Lana"
+    - "Carl"
+    - "Lorenzo"
