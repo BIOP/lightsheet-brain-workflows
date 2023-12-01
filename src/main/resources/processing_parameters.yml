@@ -8,11 +8,11 @@ global_variables:
   - "Remy"
 general_parameters:
   user: "Axel"
-  input_path: "Hello"
-  output_dir: "World"
+  input_path: "E:\\LISH\\2023-10-19_Test_NoResaving\\raw\\Demo-MouseBrain-LightSheetZ1-4x8tile-15pctOverlap-1Channel_647_2sided_illumination.czi"
+  output_dir: "E:\\LISH\\2023-10-19_Test_NoResaving\\Analysis"
   parent_yaml_parameter_file: "D:\\git\\lish_analysis\\LightSheet_brain_analysis\\\
     src\\main\\resources\\parameters.yml"
-  save_2D: false
+  save_2D: true
   save_3D: true
   preprocessing: true
   atlas_registration: false

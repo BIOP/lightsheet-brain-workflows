@@ -610,6 +610,10 @@ public class GUIGeneration {
                 } else if(o == button_select_czi_path) {
                     println("Select czi")
                     czi_input_chooser = new JFileChooser()
+                    def cziFilter = new FileNameExtensionFilter("CIZ Files (*.czi)", "czi")
+                    czi_input_chooser.fileFilter = cziFilter
+                    czi_input_chooser.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
+
                     int response = czi_input_chooser.showOpenDialog(null)
 
                     if(response == JFileChooser.APPROVE_OPTION) {
@@ -619,6 +623,7 @@ public class GUIGeneration {
                 } else if(o == button_select_output_path) {
                     println("Select output")
                     output_chooser = new JFileChooser()
+                    output_chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY);
                     int response = output_chooser.showOpenDialog(null)
 
                     if(response == JFileChooser.APPROVE_OPTION) {
