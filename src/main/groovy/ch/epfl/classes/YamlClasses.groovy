@@ -12,6 +12,8 @@ public class YamlParameters {
 
 public class GlobalVariables {
     List<String> user_list;
+    String raw_data_server;
+    String analysis_server;
 }
 
 public class GeneralParameters {
@@ -19,6 +21,7 @@ public class GeneralParameters {
     String input_path;
     String output_dir;
     String parent_yaml_parameter_file;
+    String processing_yaml_parameter_file;
     boolean save_2D;
     boolean save_3D;
     boolean preprocessing;

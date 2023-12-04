@@ -6,13 +6,14 @@ global_variables:
   - "Carl"
   - "Lorenzo"
   - "Remy"
+  raw_data_server: "E:\\LISH\\LSENS_testing_script\\Raw_Data"
 general_parameters:
-  user: "Axel"
-  input_path: "E:\\LISH\\2023-10-19_Test_NoResaving\\raw\\Demo-MouseBrain-LightSheetZ1-4x8tile-15pctOverlap-1Channel_647_2sided_illumination.czi"
-  output_dir: "E:\\LISH\\2023-10-19_Test_NoResaving\\Analysis"
+  user: "Lana"
+  input_path: "Select CZI file or folder"
+  output_dir: "E:\\LISH\\LSENS_testing_script\\Analyis\\Lana"
   parent_yaml_parameter_file: "D:\\git\\lish_analysis\\LightSheet_brain_analysis\\\
     src\\main\\resources\\parameters.yml"
-  save_2D: true
+  save_2D: false
   save_3D: true
   preprocessing: true
   atlas_registration: false

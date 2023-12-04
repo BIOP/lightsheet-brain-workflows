@@ -6,11 +6,15 @@ global_variables:
   - "Carl"
   - "Lorenzo"
   - "Remy"
+  - "Oli"
+  raw_data_server: "E:\\LISH\\LSENS_testing_script\\Raw_Data"
+  analysis_server: "E:\\LISH\\LSENS_testing_script\\Analysis"
 general_parameters:
-  user: "Olivier"
-  input_path: "Hello"
-  output_dir: "World"
+  user: ""
+  input_path: "Select CZI file or folder"
+  output_dir: "Select output folder"
   parent_yaml_parameter_file: ""
+  processing_yaml_parameter_file: ""
   save_2D: false
   save_3D: true
   preprocessing: true

@@ -6,9 +6,9 @@ import java.awt.event.ActionEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import ch.epfl.classes.*
-
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.nio.file.*
 
 public class GUIGeneration {
     // General variables for the GUI
@@ -18,6 +18,8 @@ public class GUIGeneration {
     private int height
     private boolean show_param
     private int gbc_ypos
+    private File output_folder_generated
+    private Path analysis_folder_path
 
     // Variables for the YAML parameter file selection
     private JLabel label_yaml_param
@@ -127,11 +129,11 @@ public class GUIGeneration {
         users_list = new JComboBox<String>()
         button_add_users = new JButton("New user")
 
-        label_czi_path = new JLabel("Select CZI file or folder")
+        label_czi_path = new JLabel("CZI file or folder")
         disp_czi_path = new JTextField(textfield_length)
         button_select_czi_path = new JButton("Select")
 
-        label_output_path = new JLabel("Select output folder")
+        label_output_path = new JLabel("output folder")
         disp_output_path = new JTextField(textfield_length)
         button_select_output_path = new JButton("Select")
 
@@ -510,13 +512,15 @@ public class GUIGeneration {
                         users_list.model = new DefaultComboBoxModel<String>(root_yaml_parameters.global_variables.user_list.toArray(new String[0]))
                         users_list.setSelectedItem(root_yaml_parameters.general_parameters.user)
                         button_add_users.setVisible(show_param)
+                        analysis_folder_path = Paths.get(root_yaml_parameters.global_variables.analysis_server)
+                        output_folder_generated = analysis_folder_path.resolve(users_list.getSelectedItem().toString()).toFile()
                         label_czi_path.setVisible(show_param)
                         disp_czi_path.setVisible(show_param)
                         disp_czi_path.setText(root_yaml_parameters.general_parameters.input_path)
                         button_select_czi_path.setVisible(show_param)
                         label_output_path.setVisible(show_param)
                         disp_output_path.setVisible(show_param)
-                        disp_output_path.setText(root_yaml_parameters.general_parameters.output_dir)
+                        disp_output_path.setText(output_folder_generated.toString())
                         button_select_output_path.setVisible(show_param)
                         brain_orientation_label.setVisible(show_param)
                         brain_orientation.setVisible(show_param)
@@ -533,6 +537,23 @@ public class GUIGeneration {
                         save_3D.setVisible(show_param)
                         save_3D.setSelected(root_yaml_parameters.general_parameters.save_3D)
                         button_start.setVisible(show_param)
+                        resaving_subsampling_factors.setText(root_yaml_parameters.resaving_parameters.subsampling_factors.toString())
+                        resaving_hdf5_chunk_sizes.setText(root_yaml_parameters.resaving_parameters.hdf5_chunk_sizes.toString())
+                        channel_align_downsampling.setText(root_yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ.toString())
+                        channel_align_filter_minR.setValue(root_yaml_parameters.channel_alignment_parameters.filter_min_r)
+                        tile_align_how_to_treat_channels.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0])
+                        tile_align_channels.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1])
+                        tile_align_downsample.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2].toString())
+                        tile_align_filter_minR.setValue(root_yaml_parameters.tile_alignment_parameters.filter_min_r)
+                        tile_align_optimize_fix_group.setText(root_yaml_parameters.tile_alignment_parameters.optimize_fix_group)
+                        icp_type.setText(root_yaml_parameters.icp_refinement_parameters.icp_refinement_type)
+                        icp_downsampling.setText(root_yaml_parameters.icp_refinement_parameters.downsampling)
+                        icp_interest.setText(root_yaml_parameters.icp_refinement_parameters.interest)
+                        icp_max_error.setText(root_yaml_parameters.icp_refinement_parameters.icp_max_error)
+                        fusion_preserve.setText(root_yaml_parameters.fusion_parameters.preserve_original)
+                        fusion_produce.setText(root_yaml_parameters.fusion_parameters.produce)
+                        fused_image.setText(root_yaml_parameters.fusion_parameters.fused_image)
+                        filename_addition.setText(root_yaml_parameters.fusion_parameters.filename_addition)
                         frame.setSize(width,height+8*30)
                     } else {
                         // User canceled the file selection
@@ -548,68 +569,53 @@ public class GUIGeneration {
                     //Resaving
                     resaving_subsampling_factors_label.setVisible(show_param)
                     resaving_subsampling_factors.setVisible(show_param)
-                    resaving_subsampling_factors.setText(root_yaml_parameters.resaving_parameters.subsampling_factors.toString())
                     resaving_hdf5_chunk_sizes_label.setVisible(show_param)
                     resaving_hdf5_chunk_sizes.setVisible(show_param)
-                    resaving_hdf5_chunk_sizes.setText(root_yaml_parameters.resaving_parameters.hdf5_chunk_sizes.toString())
 
                     //Channel aligement
                     channel_align_downsampling_label.setVisible(show_param)
                     channel_align_downsampling.setVisible(show_param)
-                    channel_align_downsampling.setText(root_yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ.toString())
                     channel_align_filter_minR_label.setVisible(show_param)
                     channel_align_filter_minR.setVisible(show_param)
-                    channel_align_filter_minR.setValue(root_yaml_parameters.channel_alignment_parameters.filter_min_r)
 
                     //Tile alignement
                     tile_align_how_to_treat_channels_label.setVisible(show_param)
                     tile_align_how_to_treat_channels.setVisible(show_param)
-                    tile_align_how_to_treat_channels.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0])
                     tile_align_channels_label.setVisible(show_param)
                     tile_align_channels.setVisible(show_param)
-                    tile_align_channels.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1])
                     tile_align_downsample_label.setVisible(show_param)
                     tile_align_downsample.setVisible(show_param)
-                    tile_align_downsample.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2].toString())
                     tile_align_filter_minR_label.setVisible(show_param)
                     tile_align_filter_minR.setVisible(show_param)
-                    tile_align_filter_minR.setValue(root_yaml_parameters.tile_alignment_parameters.filter_min_r)
                     tile_align_optimize_fix_group_label.setVisible(show_param)
                     tile_align_optimize_fix_group.setVisible(show_param)
-                    tile_align_optimize_fix_group.setText(root_yaml_parameters.tile_alignment_parameters.optimize_fix_group)
 
                     //ICP refinement
                     icp_type_label.setVisible(show_param)
                     icp_type.setVisible(show_param)
-                    icp_type.setText(root_yaml_parameters.icp_refinement_parameters.icp_refinement_type)
                     icp_downsampling_label.setVisible(show_param)
                     icp_downsampling.setVisible(show_param)
-                    icp_downsampling.setText(root_yaml_parameters.icp_refinement_parameters.downsampling)
                     icp_interest_label.setVisible(show_param)
                     icp_interest.setVisible(show_param)
-                    icp_interest.setText(root_yaml_parameters.icp_refinement_parameters.interest)
                     icp_max_error_label.setVisible(show_param)
                     icp_max_error.setVisible(show_param)
-                    icp_max_error.setText(root_yaml_parameters.icp_refinement_parameters.icp_max_error)
 
                     //Fusion
                     fusion_preserve_label.setVisible(show_param)
                     fusion_preserve.setVisible(show_param)
-                    fusion_preserve.setText(root_yaml_parameters.fusion_parameters.preserve_original)
                     fusion_produce_label.setVisible(show_param)
                     fusion_produce.setVisible(show_param)
-                    fusion_produce.setText(root_yaml_parameters.fusion_parameters.produce)
                     fused_image_label.setVisible(show_param)
                     fused_image.setVisible(show_param)
-                    fused_image.setText(root_yaml_parameters.fusion_parameters.fused_image)
                     filename_addition_label.setVisible(show_param)
                     filename_addition.setVisible(show_param)
-                    filename_addition.setText(root_yaml_parameters.fusion_parameters.filename_addition)
                     frame.setSize(width,height+gbc_ypos*30)
 
                 } else if(o == button_select_czi_path) {
                     println("Select czi")
+                    File czi_base_file = new File(root_yaml_parameters.global_variables.raw_data_server.toString())
                     czi_input_chooser = new JFileChooser()
+                    czi_input_chooser.setCurrentDirectory(new File(czi_base_file.getAbsolutePath() + File.separator + users_list.getSelectedItem()))
                     def cziFilter = new FileNameExtensionFilter("CIZ Files (*.czi)", "czi")
                     czi_input_chooser.fileFilter = cziFilter
                     czi_input_chooser.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
@@ -647,6 +653,8 @@ public class GUIGeneration {
                         // User clicked "Cancel" or closed the window
                         println("Add new user canceled!")
                     }
+                    output_folder_generated = analysis_folder_path.resolve(users_list.getSelectedItem().toString()).toFile()
+                    disp_output_path.setText(output_folder_generated.toString())
                 } else if(o == button_start) {
                     JOptionPane.showMessageDialog(
                             null,               // Parent component (null for no parent)
@@ -663,6 +671,7 @@ public class GUIGeneration {
                     edited_yaml_parameters.global_variables.user_list = user_list_items
                     edited_yaml_parameters.general_parameters.user = users_list.getSelectedItem()
                     edited_yaml_parameters.general_parameters.input_path = disp_czi_path.getText()
+                    disp_output_path.setText(output_folder_generated.toString())
                     edited_yaml_parameters.general_parameters.output_dir = disp_output_path.getText()
                     edited_yaml_parameters.general_parameters.parent_yaml_parameter_file = disp_yaml_param.getText()
                     edited_yaml_parameters.general_parameters.preprocessing = preprocessing.isSelected()
@@ -695,6 +704,7 @@ public class GUIGeneration {
                     edited_yaml_parameters.channel_alignment_parameters.filter_min_r = channel_align_filter_minR.getValue()
                     edited_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] = tile_align_how_to_treat_channels.getText()
                     edited_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] = tile_align_channels.getText()
+
                     edited_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2] = tile_align_downsample.getText().replaceAll("[\\[\\]()]","").split("\\s*, \\s*").collect(e->Integer.parseInt(e))
                     edited_yaml_parameters.tile_alignment_parameters.filter_min_r = tile_align_filter_minR.getValue()
                     edited_yaml_parameters.tile_alignment_parameters.optimize_fix_group = tile_align_optimize_fix_group.getText()
@@ -706,12 +716,20 @@ public class GUIGeneration {
                     edited_yaml_parameters.fusion_parameters.produce = fusion_produce.getText()
                     edited_yaml_parameters.fusion_parameters.fused_image = fused_image.getText()
                     edited_yaml_parameters.fusion_parameters.filename_addition = filename_addition.getText()
-
-                    om.writeValue(new File("D:\\git\\lish_analysis\\LightSheet_brain_analysis\\src\\main\\resources\\processing_parameters.yml"), edited_yaml_parameters)
+                    output_folder_generated = analysis_folder_path.resolve(users_list.getSelectedItem().toString()).toFile()
+                    edited_yaml_parameters.general_parameters.processing_yaml_parameter_file = new File(output_folder_generated.getAbsolutePath() + File.separator + "processing_parameters.yml").toString()
+                    if(!output_folder_generated.exists()){
+                        println("Saving in this folder" + disp_output_path.getText())
+                        output_folder_generated.mkdirs()
+                    }
+                    om.writeValue(new File(output_folder_generated.getAbsolutePath() + File.separator + "processing_parameters.yml"), edited_yaml_parameters)
                 } else if(o == button_cancel) {
                     System.exit(0)
+                } else if(o == users_list) {
+                    println("Editing parameters")
+                    output_folder_generated = analysis_folder_path.resolve(users_list.getSelectedItem()).toFile()
+                    disp_output_path.setText(output_folder_generated.toString())
                 }
-
             }
         }
 
@@ -722,6 +740,7 @@ public class GUIGeneration {
         button_add_users.addActionListener(buttonListener)
         button_start.addActionListener(buttonListener)
         button_cancel.addActionListener(buttonListener)
+        users_list.addActionListener(buttonListener)
     }
 
 }
