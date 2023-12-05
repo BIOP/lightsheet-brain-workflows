@@ -5,10 +5,11 @@ import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import ch.epfl.classes.*
+//import ch.epfl.classes.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.nio.file.*
+import ij.IJ
 
 public class GUIGeneration {
     // General variables for the GUI
@@ -656,6 +657,8 @@ public class GUIGeneration {
                     output_folder_generated = analysis_folder_path.resolve(users_list.getSelectedItem().toString()).toFile()
                     disp_output_path.setText(output_folder_generated.toString())
                 } else if(o == button_start) {
+               
+                
                     JOptionPane.showMessageDialog(
                             null,               // Parent component (null for no parent)
                             "Let's process some brains!",   // Message to display
@@ -748,3 +751,75 @@ public class GUIGeneration {
 GUIGeneration gd = new GUIGeneration(800, 120)
 gd.setUpGUI()
 gd.setUpButtonListeners()
+
+
+void performFusing(File yaml) {
+		
+}
+
+
+
+//---------------------------------------Classes------------------------------------------------//
+
+public class YamlParameters {
+    GlobalVariables global_variables;
+    GeneralParameters general_parameters;
+    ResavingParameters resaving_parameters;
+    ChannelParameters channel_alignment_parameters;
+    TileParameters tile_alignment_parameters;
+    IcpRefinementParameters icp_refinement_parameters;
+    FusionParameters fusion_parameters;
+}
+
+public class GlobalVariables {
+    java.util.List<String> user_list;
+    String raw_data_server;
+    String analysis_server;
+    boolean use_fast_reader;
+    boolean resave_in_hdf5;
+    boolean use_fast_fusion;
+}
+
+public class GeneralParameters {
+    String user;
+    String input_path;
+    String output_dir;
+    String parent_yaml_parameter_file;
+    String processing_yaml_parameter_file;
+    boolean save_2D;
+    boolean save_3D;
+    boolean preprocessing;
+    boolean atlas_registration;
+    java.util.List<String> brain_orientation;
+    String downsampling;
+}
+
+public class ResavingParameters {
+    java.util.List<String> subsampling_factors;
+    java.util.List<String> hdf5_chunk_sizes;
+}
+
+public class ChannelParameters {
+    java.util.List pairwise_shifts_downsamples_XYZ;
+    float filter_min_r;
+}
+
+public class TileParameters {
+    java.util.List pairwise_shifts_parameters;
+    float filter_min_r;
+    String	optimize_fix_group;
+}
+
+public class IcpRefinementParameters {
+    String icp_refinement_type;
+    String downsampling;
+    String interest;
+    String icp_max_error;
+}
+
+public class FusionParameters {
+    String preserve_original;
+    String produce;
+    String fused_image;
+    String filename_addition;
+}

@@ -7,8 +7,16 @@ global_variables:
   - "Lorenzo"
   - "Remy"
   - "Oli"
+  - "Helmut"
+  - "Phil"
+  - "Arne"
+  - "Lolo"
   raw_data_server: "E:\\LISH\\LSENS_testing_script\\Raw_Data"
   analysis_server: "E:\\LISH\\LSENS_testing_script\\Analysis"
+  use_fast_reader: true
+  resave_in_hdf5: false
+  use_fast_fusion: true
+
 general_parameters:
   user: ""
   input_path: "Select CZI file or folder"
