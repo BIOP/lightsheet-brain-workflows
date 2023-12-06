@@ -11,7 +11,8 @@ import java.util.regex.Pattern
 import java.nio.file.*
 import ij.IJ
 
-public class GUIGeneration {
+
+public class GUIGeneration extends HelperFunctions {
     // General variables for the GUI
     private JFrame frame
     private JPanel panel
@@ -52,6 +53,12 @@ public class GUIGeneration {
     // Variables for preprocessing and registration
     private JLabel method_label
     private JCheckBox preprocessing
+    private JLabel preprocessing_method_label
+    private JCheckBox use_fast_reader
+    private JCheckBox resave_in_hdf5
+    private JCheckBox use_fast_fusion
+    private JLabel fusion_method_label
+    private JTextField fusion_method
     private JCheckBox registration
     private JLabel output_format_label
     private JCheckBox save_2D
@@ -114,7 +121,6 @@ public class GUIGeneration {
     private JButton button_cancel
 
 
-
     public GUIGeneration(int w, int h) {
         frame = new JFrame()
         int textfield_length = 20
@@ -141,6 +147,13 @@ public class GUIGeneration {
         method_label = new JLabel("Method to use")
         preprocessing = new JCheckBox("Pre-processing");
         registration = new JCheckBox("Atlas registration");
+
+        preprocessing_method_label = new JLabel("Preprocessing method:")
+        use_fast_reader = new JCheckBox("Fast reader")
+        resave_in_hdf5 = new JCheckBox("HDF5 resaving")
+        use_fast_fusion = new JCheckBox("Fast fusion")
+        fusion_method_label = new JLabel("Fusion method:")
+        fusion_method = new JTextField(5)
 
         output_format_label = new JLabel("Desired output")
         save_2D = new JCheckBox("2D tiffs");
@@ -220,7 +233,7 @@ public class GUIGeneration {
         GridBagConstraints gbc = new GridBagConstraints()
         frame.setSize(width,height)
         frame.setTitle("Parameter selection")
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
         cp.add(panel, BorderLayout.PAGE_START)
 
         gbc.insets = new Insets(5,5,5,5)
@@ -275,6 +288,24 @@ public class GUIGeneration {
         panel.add(preprocessing, gbc)
         gbc.gridx = 2
         panel.add(registration , gbc)
+
+        gbc.gridx = 0
+        gbc.gridy = gbc.gridy + 1
+        panel.add(preprocessing_method_label, gbc)
+        gbc.gridx = 1
+        panel.add(use_fast_reader, gbc)
+        gbc.gridx = 2
+        panel.add(resave_in_hdf5 , gbc)
+        gbc.gridx = 3
+        panel.add(use_fast_fusion , gbc)
+
+        gbc.gridx = 2
+        gbc.gridy = gbc.gridy + 1
+        panel.add(fusion_method_label, gbc)
+        gbc.gridx = 3
+        gbc.fill = GridBagConstraints.HORIZONTAL
+        panel.add(fusion_method, gbc)
+        gbc.fill = GridBagConstraints.NONE
 
         gbc.gridx = 0
         gbc.gridy = gbc.gridy + 1
@@ -424,6 +455,12 @@ public class GUIGeneration {
         method_label.setVisible(show_param)
         preprocessing.setVisible(show_param)
         registration.setVisible(show_param)
+        preprocessing_method_label.setVisible(show_param)
+        use_fast_reader.setVisible(show_param)
+        resave_in_hdf5.setVisible(show_param)
+        use_fast_fusion.setVisible(show_param)
+        fusion_method_label.setVisible(show_param)
+        fusion_method.setVisible(show_param)
         output_format_label.setVisible(show_param)
         save_2D.setVisible(show_param)
         save_3D.setVisible(show_param)
@@ -532,6 +569,27 @@ public class GUIGeneration {
                         preprocessing.setSelected(root_yaml_parameters.general_parameters.preprocessing)
                         registration.setVisible(show_param)
                         registration.setSelected(root_yaml_parameters.general_parameters.atlas_registration)
+                        preprocessing_method_label.setVisible(show_param)
+                        use_fast_reader.setSelected(root_yaml_parameters.global_variables.use_fast_reader)
+                        resave_in_hdf5.setSelected(root_yaml_parameters.global_variables.resave_in_hdf5)
+                        use_fast_reader.setVisible(show_param)
+                        resave_in_hdf5.setVisible(show_param)
+                        if (use_fast_reader.isSelected()) {
+                            resave_in_hdf5.setSelected(false)
+                        }
+                        if (resave_in_hdf5.isSelected()){
+                            use_fast_reader.setSelected(false)
+                        }
+                        use_fast_fusion.setSelected(root_yaml_parameters.global_variables.use_fast_fusion)
+                        fusion_method.setText(root_yaml_parameters.global_variables.fusion_method)
+                        use_fast_fusion.setVisible(show_param)
+                        if (use_fast_fusion.isSelected()){
+                            fusion_method_label.setVisible(show_param)
+                            fusion_method.setVisible(show_param)
+                            frame.setSize(width,height+9*30)
+                        } else {
+                            frame.setSize(width,height+8*30)
+                        }
                         output_format_label.setVisible(show_param)
                         save_2D.setVisible(show_param)
                         save_2D.setSelected(root_yaml_parameters.general_parameters.save_2D)
@@ -555,7 +613,6 @@ public class GUIGeneration {
                         fusion_produce.setText(root_yaml_parameters.fusion_parameters.produce)
                         fused_image.setText(root_yaml_parameters.fusion_parameters.fused_image)
                         filename_addition.setText(root_yaml_parameters.fusion_parameters.filename_addition)
-                        frame.setSize(width,height+8*30)
                     } else {
                         // User canceled the file selection
                         println("File selection canceled by the user.")
@@ -721,17 +778,45 @@ public class GUIGeneration {
                     edited_yaml_parameters.fusion_parameters.filename_addition = filename_addition.getText()
                     output_folder_generated = analysis_folder_path.resolve(users_list.getSelectedItem().toString()).toFile()
                     edited_yaml_parameters.general_parameters.processing_yaml_parameter_file = new File(output_folder_generated.getAbsolutePath() + File.separator + "processing_parameters.yml").toString()
+                    edited_yaml_parameters.global_variables.use_fast_reader = use_fast_reader.isSelected()
+                    edited_yaml_parameters.global_variables.resave_in_hdf5 = resave_in_hdf5.isSelected()
+                    edited_yaml_parameters.global_variables.use_fast_fusion = use_fast_fusion.isSelected()
+                    edited_yaml_parameters.global_variables.fusion_method = fusion_method.getText()
                     if(!output_folder_generated.exists()){
                         println("Saving in this folder" + disp_output_path.getText())
                         output_folder_generated.mkdirs()
                     }
-                    om.writeValue(new File(output_folder_generated.getAbsolutePath() + File.separator + "processing_parameters.yml"), edited_yaml_parameters)
+                    def saved_yaml = new File(output_folder_generated.getAbsolutePath() + File.separator + "processing_parameters.yml")
+                    om.writeValue(saved_yaml, edited_yaml_parameters)
+                    //SwingUtilities.invokeLater(() -> performPreprocessing(saved_yaml));
+
+                    new Thread(() -> performPreprocessing(saved_yaml)).start();
+
                 } else if(o == button_cancel) {
                     System.exit(0)
                 } else if(o == users_list) {
                     println("Editing parameters")
                     output_folder_generated = analysis_folder_path.resolve(users_list.getSelectedItem()).toFile()
                     disp_output_path.setText(output_folder_generated.toString())
+                } else if(o == resave_in_hdf5) {
+                    if (resave_in_hdf5.isSelected()){
+                        use_fast_reader.setSelected(false)
+                    }
+                } else if(o == use_fast_reader) {
+                    if (use_fast_reader.isSelected()) {
+                        resave_in_hdf5.setSelected(false)
+                    }
+                } else if(o == use_fast_fusion) {
+                    if (use_fast_fusion.isSelected()) {
+                        fusion_method_label.setVisible(true)
+                        fusion_method.setVisible(true)
+                        frame.setSize(width,height+9*30)
+
+                    } else {
+                        fusion_method_label.setVisible(false)
+                        fusion_method.setVisible(false)
+                        frame.setSize(width,height+8*30)
+                    }
                 }
             }
         }
@@ -744,6 +829,308 @@ public class GUIGeneration {
         button_start.addActionListener(buttonListener)
         button_cancel.addActionListener(buttonListener)
         users_list.addActionListener(buttonListener)
+        resave_in_hdf5.addActionListener(buttonListener)
+        use_fast_reader.addActionListener(buttonListener)
+        use_fast_fusion.addActionListener(buttonListener)
+    }
+
+    static void performPreprocessing(File yaml_file) {
+        def ObjectMapper om = new ObjectMapper(new YAMLFactory())
+        def YamlParameters yaml_parameters = om.readValue(yaml_file, YamlParameters)
+        // Create a list to store log messages
+        def logMessages = []
+
+        //Initialize variables from YAML file
+        def CZI_file = new File(yaml_parameters.general_parameters.input_path)
+        def output_dir = new File(yaml_parameters.general_parameters.output_dir)
+        def doFast = yaml_parameters.global_variables.use_fast_reader
+        def doResaving = yaml_parameters.global_variables.resave_in_hdf5
+        def doFuse = yaml_parameters.global_variables.use_fast_fusion
+        def fusion_method = yaml_parameters.global_variables.fusion_method
+        def file_name = CZI_file.name.tokenize(".")
+        def input_dir = CZI_file.parent
+        def file_xml_path = output_dir.toString() + File.separator + file_name[0] + ".xml"
+
+        def StartTime = System.currentTimeMillis()
+        def TimeA = StartTime
+
+        // Loading data from CZI file--------------------------------------------------------------------------------------------------------
+// Check if the 'doResaving' flag is set to true, if so, resave in HDF5 format
+        if (doFast) {
+            print("Computing script time when using the CZI Fast reader without resaving\n")
+            print("Loading/Resaving time = ")
+            //logMessages.each { message -> textPanel.append(message) }
+            // Import CZI file and resave it in xml format
+            IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + CZI_file + "] output_folder=[" + output_dir + "]")
+            // Import dataset into bigsticher
+            IJ.run("BigStitcher", "browse=[" + file_xml_path + "] select=[" + file_xml_path + "]")
+        } else {
+            if (doResaving) {
+                print("Computing script time when resaving in HDF5\n")
+                print("Loading/Resaving time = ")
+                IJ.run("BigStitcher", "select=define " +
+                        "define_dataset=[Automatic Loader (Bioformats based)] " +
+                        "project_filename=[" + file_name[0] + ".xml] " +
+                        "path=[" + CZI_file + "] " +
+                        "exclude=10 " +
+                        "bioformats_series_are?=Tiles " +
+                        "bioformats_channels_are?=Channels " +
+                        "move_tiles_to_grid_(per_angle)?=[Do not move Tiles to Grid (use Metadata if available)] " +
+                        "how_to_load_images=[Re-save as multiresolution HDF5] " +
+                        "load_raw_data_virtually " +
+                        "dataset_save_path=[" + output_dir + "] " +
+                        "subsampling_factors=[{ {1,1,1}, {2,2,1}, {4,4,1}, {8,8,1} }] " +
+                        "hdf5_chunk_sizes=[{ {64,64,1}, {64,32,2}, {32,32,4}, {32,32,4} }] " +
+                        "timepoints_per_partition=1 setups_per_partition=0 use_deflate_compression")
+            } else {
+                print("Computing script time without resaving\n")
+                print("Loading/Resaving time = ")
+                IJ.run("BigStitcher", "select=define " +
+                        "define_dataset=[Automatic Loader (Bioformats based)] " +
+                        "project_filename=[" + file_name[0] + ".xml] " +
+                        "path=[" + CZI_file + "] " +
+                        "exclude=10 " +
+                        "bioformats_series_are?=Tiles " +
+                        "bioformats_channels_are?=Channels " +
+                        "move_tiles_to_grid_(per_angle)?=[Do not move Tiles to Grid (use Metadata if available)] " +
+                        "how_to_load_images=[Load raw data directly] " +
+                        "load_raw_data_virtually " +
+                        "dataset_save_path=[" + output_dir + "]")
+            }
+        }
+
+// Record the time after resaving or not
+        def TimeB = System.currentTimeMillis()
+        def ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+// Perform Channel alignement-------------------------------------------------------------------------------------------------
+// Perform pairwise shift calculations
+        print("Channel Pairwise-shift time = ")
+        TimeA = System.currentTimeMillis()
+        IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
+                "process_angle=[All angles] " +
+                "process_channel=[All channels] " +
+                "process_illumination=[All illuminations] " +
+                "process_tile=[All tiles] " +
+                "process_timepoint=[All Timepoints] " +
+                "method=[Phase Correlation] " +
+                "show_expert_grouping_options " +
+                "how_to_treat_timepoints=[treat individually] " +
+                "how_to_treat_channels=compare " +
+                "how_to_treat_illuminations=group " +
+                "how_to_treat_angles=[treat individually] " +
+                "how_to_treat_tiles=[treat individually] " +
+                "downsample_in_x=2 " +
+                "downsample_in_y=2 " +
+                "downsample_in_z=1")
+
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+// Filter the pairwise shifts based on certain criteria
+        print("Channel Filter time = ")
+        TimeA = System.currentTimeMillis()
+        IJ.run("Filter pairwise shifts ...", "select=[" + file_xml_path + "] " +
+                "filter_by_link_quality " +
+                "min_r=0.7 " +
+                "max_r=1")
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+// Perform global optimization and apply shifts
+        print("Channel Optimization time = ")
+        TimeA = System.currentTimeMillis()
+        IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
+                "process_angle=[All angles] " +
+                "process_channel=[All channels] " +
+                "process_illumination=[All illuminations] " +
+                "process_tile=[All tiles] " +
+                "process_timepoint=[All Timepoints] " +
+                "relative=2.500 " +
+                "absolute=3.500 " +
+                "global_optimization_strategy=[Two-Round using metadata to align unconnected Tiles] " +
+                "show_expert_grouping_options " +
+                "how_to_treat_timepoints=[treat individually] " +
+                "how_to_treat_channels=compare " +
+                "how_to_treat_illuminations=group " +
+                "how_to_treat_angles=[treat individually] " +
+                "how_to_treat_tiles=[treat individually] " +
+                "fix_group_0-15")
+
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+// Perform Tile alignement-------------------------------------------------------------------------------------------------
+// Perform pairwise shift calculations
+        print("Tile Pairwise-shift time = ")
+        TimeA = System.currentTimeMillis()
+        IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
+                "process_angle=[All angles] " +
+                "process_channel=[All channels] " +
+                "process_illumination=[All illuminations] " +
+                "process_tile=[All tiles] " +
+                "process_timepoint=[All Timepoints] " +
+                "method=[Phase Correlation] " +
+                "show_expert_grouping_options " +
+                "how_to_treat_timepoints=[treat individually] " +
+                "how_to_treat_channels=group " +
+                "how_to_treat_illuminations=group " +
+                "how_to_treat_angles=[treat individually] " +
+                "how_to_treat_tiles=compare " +
+                "channels=[use Channel 488] " +
+                "downsample_in_x=4 " +
+                "downsample_in_y=4 " +
+                "downsample_in_z=2")
+
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+// Filter the pairwise shifts based on certain criteria
+        print("Tile Filter time = ")
+        TimeA = System.currentTimeMillis()
+        IJ.run("Filter pairwise shifts ...", "select=[" + file_xml_path + "] " +
+                "filter_by_link_quality " +
+                "min_r=0.7 " +
+                "max_r=1")
+
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+// Perform global optimization and apply shifts
+        print("Tile Optimization time = ")
+        TimeA = System.currentTimeMillis()
+        IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
+                "process_angle=[All angles] " +
+                "process_channel=[All channels] " +
+                "process_illumination=[All illuminations] " +
+                "process_tile=[All tiles] " +
+                "process_timepoint=[All Timepoints] " +
+                "relative=2.500 " +
+                "absolute=3.500 " +
+                "global_optimization_strategy=[Two-Round using metadata to align unconnected Tiles] " +
+                "show_expert_grouping_options how_to_treat_timepoints=[treat individually] " +
+                "how_to_treat_channels=group " +
+                "how_to_treat_illuminations=group " +
+                "how_to_treat_angles=[treat individually] " +
+                "how_to_treat_tiles=compare " +
+                "fix_group_0-15")
+
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+        // Perform ICP refinement----------------------------------------------------------------------
+        // Perform ICP (Iterative Closest Point) refinement
+        print("Refinement time = ")
+        TimeA = System.currentTimeMillis()
+        IJ.run("ICP Refinement ...", "select=[" + file_xml_path + "] " +
+                "process_angle=[All angles] " +
+                "process_channel=[All channels] " +
+                "process_illumination=[All illuminations] " +
+                "process_tile=[All tiles] " +
+                "process_timepoint=[All Timepoints] " +
+                "icp_refinement_type=[Simple (all together)] " +
+                //"global_optimization_strategy=[Two-Round: Handle unconnected tiles, remove wrong links RELAXED (5.0x / 7.0px)] " +
+                "downsampling=[Downsampling 8/8/4] " +
+                "interest=[Average Threshold] " +
+                "icp_max_error=[Normal Adjustment (<5px)]")
+
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+        // Perform fusion of data ----------------------------------------------------------------------
+        // Fuse the dataset
+        print("Fusing time = ")
+        TimeA = System.currentTimeMillis()
+
+        if (doFuse) {
+            IJ.run("Fuse a BigStitcher dataset to OME-Tiff", "xml_bigstitcher_file=[" + file_xml_path + "] " +
+                    "output_path_directory=[" + output_dir + "] " +
+                    "range_channels= " +
+                    "range_slices= " +
+                    "range_frames= " +
+                    "n_resolution_levels=1 " +
+                    "use_lzw_compression=false " +
+                    "split_slices=false " +
+                    "split_channels=false " +
+                    "split_frames=false " +
+                    "override_z_ratio=false " +
+                    "z_ratio= " +
+                    "use_interpolation=false " +
+                    "fusion_method=[" + fusion_method + "] ")
+        } else {
+            IJ.run("Fuse dataset ...", "select=[" + file_xml_path + "] " +
+                    "process_angle=[All angles] " +
+                    "process_channel=[All channels] " +
+                    "process_illumination=[All illuminations] " +
+                    "process_tile=[All tiles] " +
+                    "process_timepoint=[All Timepoints] " +
+                    "bounding_box=[Currently Selected Views] " +
+                    "downsampling=1 " +
+                    "pixel_type=[16-bit unsigned integer] " +
+                    "interpolation=[Linear Interpolation] " +
+                    "image=[Precompute Image] " +
+                    "interest_points_for_non_rigid=[-= Disable Non-Rigid =-] " +
+                    "blend " +
+                    "preserve_original " +
+                    "produce=[Each timepoint & channel] " +
+                    "fused_image=[Save as (compressed) TIFF stacks] " +
+                    "output_file_directory=[" + output_dir + "] " +
+                    "filename_addition=[]")
+        }
+
+        TimeB = System.currentTimeMillis()
+        ComputationTime = computeTime(TimeA, TimeB)
+        print(ComputationTime + "\n")
+
+        // Record the end time for the entire computation and calculate the total time
+        def EndTime = System.currentTimeMillis()
+        ComputationTime = computeTime(StartTime, EndTime)
+        print("Total computing time = " + ComputationTime + "\n")
+
+        // Define the filename for saving the computation times
+        def computing_time_file = output_dir.toString() + File.separator + EndTime + "_Computing_times"
+
+        if (doFuse) {
+            computing_time_file += "_FastFusion"
+        }
+
+        if (doFast) {
+            computing_time_file += "_FastReader_noResaving.txt"
+        } else {
+            if (doResaving) {
+                computing_time_file += "_HDF5_Resaving.txt"
+            } else {
+                computing_time_file += "_noResaving.txt"
+            }
+        }
+
+        // Save the computation times to a text file
+        IJ.run("Text...", "save=[" + computing_time_file + "]")
+
+        // Print the log at the end
+        //logMessages.each { message -> IJ.log(message) }
+        //return
+
+        // Print the log at the end
+        //logMessages.each { message -> IJ.log(message) }
+    }
+
+    /* computeTime(TimeA, TimeB) returns the time interval as min:s:ms. */
+    static computeTime(long TimeA, long TimeB) {
+        def time_diff = TimeB - TimeA
+        def Minutes = Math.floor(time_diff / 60000)
+        def Seconds = Math.floor(((time_diff / 60000) - Minutes) * 60)
+        def Milliseconds = ((((time_diff / 60000) - Minutes) * 60) - Seconds) * 1000
+        def ComputationTime = "$Minutes:$Seconds:$Milliseconds"
+        return ComputationTime
     }
 
 }
@@ -753,11 +1140,13 @@ gd.setUpGUI()
 gd.setUpButtonListeners()
 
 
-void performFusing(File yaml) {
-		
+//--------------------------------------Functions-----------------------------------------------//
+
+public class HelperFunctions {
+    void addToLog(ArrayList<String> logMessages, String message) {
+        logMessages.add(message)
+    }
 }
-
-
 
 //---------------------------------------Classes------------------------------------------------//
 
@@ -778,6 +1167,7 @@ public class GlobalVariables {
     boolean use_fast_reader;
     boolean resave_in_hdf5;
     boolean use_fast_fusion;
+    String fusion_method;
 }
 
 public class GeneralParameters {
