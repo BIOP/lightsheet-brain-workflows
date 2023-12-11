@@ -11,8 +11,8 @@ global_variables:
   - "Phil"
   - "Arne"
   - "Lolo"
-  raw_data_server: "E:\\LISH\\LSENS_testing_script\\Raw_Data"
-  analysis_server: "E:\\LISH\\LSENS_testing_script\\Analysis"
+  raw_data_server: "\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\data" #"E:\\Petersen-Lab\\data"
+  analysis_server: "\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\analysis"
   use_fast_reader: false
   resave_in_hdf5: false
   use_fast_fusion: true
@@ -20,7 +20,8 @@ global_variables:
 
 general_parameters:
   user: ""
-  input_path: "Select CZI file or folder"
+  input_folders:
+    - "Select CZI folder or folders"
   output_dir: "Select output folder"
   parent_yaml_parameter_file: ""
   processing_yaml_parameter_file: ""
