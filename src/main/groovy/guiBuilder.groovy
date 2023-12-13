@@ -11,7 +11,7 @@ import java.util.regex.Pattern
 
 import ij.IJ
 
-public class GUIGeneration {
+public class GUIGeneration{
     // General variables for the GUI
     private JFrame frame
     private JPanel panel

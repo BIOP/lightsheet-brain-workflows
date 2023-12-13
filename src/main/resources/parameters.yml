@@ -5,23 +5,18 @@ global_variables:
   - "Lana"
   - "Carl"
   - "Lorenzo"
-  - "Remy"
-  - "Oli"
-  - "Helmut"
-  - "Phil"
-  - "Arne"
-  - "Lolo"
-  raw_data_server: "\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\data" #"E:\\Petersen-Lab\\data"
-  analysis_server: "\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\analysis"
+  raw_data_server: "\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\\
+    data"
+  analysis_server: "\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\\
+    analysis"
   use_fast_reader: false
   resave_in_hdf5: false
   use_fast_fusion: true
   fusion_method: "SMOOTH AVERAGE"
-
 general_parameters:
   user: ""
   input_folders:
-    - "Select CZI folder or folders"
+  - "Select CZI folder or folders"
   output_dir: "Select output folder"
   parent_yaml_parameter_file: ""
   processing_yaml_parameter_file: ""
@@ -29,8 +24,10 @@ general_parameters:
   save_3D: true
   preprocessing: true
   atlas_registration: false
-  brain_orientation:
-  - "RAS"
+  input_brain_orientation:
+  - "sal"
+  output_brain_orientation:
+  - "asr"
   downsampling: "1"
 resaving_parameters:
   subsampling_factors:
@@ -51,6 +48,7 @@ channel_alignment_parameters:
   - 2
   - 1
   filter_min_r: 0.7
+  optimize_fix_group: "fix_group_0-10"
 tile_alignment_parameters:
   pairwise_shifts_parameters:
   - "group"
@@ -69,4 +67,4 @@ fusion_parameters:
   preserve_original: "preserve_original"
   produce: "Each timepoint & channel"
   fused_image: "Save as (compressed) TIFF stacks"
-  filename_addition: "filename_addition"
+  filename_addition: ""
