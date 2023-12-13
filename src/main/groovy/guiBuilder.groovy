@@ -8,13 +8,14 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 //import ch.epfl.classes.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.nio.file.*
+
 import ij.IJ
 
-public class GUIGeneration extends HelperFunctions {
+public class GUIGeneration {
     // General variables for the GUI
     private JFrame frame
     private JPanel panel
+    private JScrollPane scrollPane
     private int width
     private int height
     private boolean show_param
@@ -62,9 +63,12 @@ public class GUIGeneration extends HelperFunctions {
     private JLabel output_format_label
     private JCheckBox save_2D
     private JCheckBox save_3D
-    private JLabel brain_orientation_label
-    private JTextField brain_orientation
-    private JLabel brain_orientation_comment
+    private JLabel input_brain_orientation_label
+    private JTextField input_brain_orientation
+    private JLabel input_brain_orientation_comment
+    private JLabel output_brain_orientation_label
+    private JTextField output_brain_orientation
+    private JLabel output_brain_orientation_comment
 
     // Variables for pre-processing algorithm with BigStitcher
     private JLabel global_downsampling_label
@@ -81,6 +85,8 @@ public class GUIGeneration extends HelperFunctions {
     private JTextField channel_align_downsampling
     private JLabel channel_align_filter_minR_label
     private JSpinner channel_align_filter_minR
+    private JLabel channel_align_optimize_fix_group_label
+    private JTextField channel_align_optimize_fix_group
 
     //Tile alignement
     private JLabel tile_align_how_to_treat_channels_label
@@ -119,11 +125,13 @@ public class GUIGeneration extends HelperFunctions {
     private JButton button_start
     private JButton button_cancel
 
-
     public GUIGeneration(int w, int h) {
         frame = new JFrame()
         int textfield_length = 20
         panel= new JPanel()
+
+        scrollPane = new JScrollPane(panel)
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
 
         //General cariables
         label_yaml_param = new JLabel("Select YAML file")
@@ -158,9 +166,13 @@ public class GUIGeneration extends HelperFunctions {
         save_2D = new JCheckBox("2D tiffs");
         save_3D = new JCheckBox("3D tiffs");
 
-        brain_orientation_label = new JLabel("Brain orientation code")
-        brain_orientation = new JTextField(textfield_length)
-        brain_orientation_comment = new JLabel("<= Use the RAS code system")
+        input_brain_orientation_label = new JLabel("Input brain(s) orientation")
+        input_brain_orientation = new JTextField(textfield_length)
+        input_brain_orientation_comment = new JLabel("<= Use the asl code system")
+
+        output_brain_orientation_label = new JLabel("output brain orientation")
+        output_brain_orientation = new JTextField(textfield_length)
+        output_brain_orientation_comment = new JLabel("<= Use the asl code system")
 
         global_downsampling_label = new JLabel("Global downsampling factor")
         global_downsampling = new JTextField(textfield_length)
@@ -181,6 +193,8 @@ public class GUIGeneration extends HelperFunctions {
         def BigDecimal default_value = 0.0
         def minR_model_channel = new SpinnerNumberModel(default_value, min_value, max_value, step_size)
         channel_align_filter_minR = new JSpinner(minR_model_channel)
+        channel_align_optimize_fix_group_label = new JLabel("Channel Optimize_fix_group")
+        channel_align_optimize_fix_group = new JTextField(textfield_length)
 
         //Tile alignement
         tile_align_how_to_treat_channels_label = new JLabel("Tile how_to_treat_channels")
@@ -233,7 +247,9 @@ public class GUIGeneration extends HelperFunctions {
         frame.setSize(width,height)
         frame.setTitle("Parameter selection")
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
-        cp.add(panel, BorderLayout.PAGE_START)
+
+        cp.add(scrollPane, BorderLayout.CENTER)
+        //cp.add(panel, BorderLayout.PAGE_START)
 
         gbc.insets = new Insets(5,5,5,5)
 
@@ -274,11 +290,19 @@ public class GUIGeneration extends HelperFunctions {
 
         gbc.gridx = 0
         gbc.gridy = gbc.gridy + 1
-        panel.add(brain_orientation_label, gbc)
+        panel.add(input_brain_orientation_label, gbc)
         gbc.gridx = 1
-        panel.add(brain_orientation, gbc)
+        panel.add(input_brain_orientation, gbc)
         gbc.gridx = 2
-        panel.add(brain_orientation_comment , gbc)
+        panel.add(input_brain_orientation_comment , gbc)
+
+        gbc.gridx = 0
+        gbc.gridy = gbc.gridy + 1
+        panel.add(output_brain_orientation_label, gbc)
+        gbc.gridx = 1
+        panel.add(output_brain_orientation, gbc)
+        gbc.gridx = 2
+        panel.add(output_brain_orientation_comment , gbc)
 
         gbc.gridx = 0
         gbc.gridy = gbc.gridy + 1
@@ -349,6 +373,12 @@ public class GUIGeneration extends HelperFunctions {
         gbc.fill = GridBagConstraints.HORIZONTAL
         panel.add(channel_align_filter_minR, gbc)
         gbc.fill = GridBagConstraints.NONE
+
+        gbc.gridx = 0
+        gbc.gridy = gbc.gridy + 1
+        panel.add(channel_align_optimize_fix_group_label, gbc)
+        gbc.gridx = 1
+        panel.add(channel_align_optimize_fix_group, gbc)
 
         gbc.gridx = 0
         gbc.gridy = gbc.gridy + 1
@@ -448,9 +478,12 @@ public class GUIGeneration extends HelperFunctions {
         label_output_path.setVisible(show_param)
         disp_output_path.setVisible(show_param)
         button_select_output_path.setVisible(show_param)
-        brain_orientation_label.setVisible(show_param)
-        brain_orientation.setVisible(show_param)
-        brain_orientation_comment.setVisible(show_param)
+        input_brain_orientation_label.setVisible(show_param)
+        input_brain_orientation.setVisible(show_param)
+        input_brain_orientation_comment.setVisible(show_param)
+        output_brain_orientation_label.setVisible(show_param)
+        output_brain_orientation.setVisible(show_param)
+        output_brain_orientation_comment.setVisible(show_param)
         method_label.setVisible(show_param)
         preprocessing.setVisible(show_param)
         registration.setVisible(show_param)
@@ -478,6 +511,8 @@ public class GUIGeneration extends HelperFunctions {
         channel_align_downsampling.setVisible(show_param)
         channel_align_filter_minR_label.setVisible(show_param)
         channel_align_filter_minR.setVisible(show_param)
+        channel_align_optimize_fix_group_label.setVisible(show_param)
+        channel_align_optimize_fix_group.setVisible(show_param)
 
         //Tile alignement
         tile_align_how_to_treat_channels_label.setVisible(show_param)
@@ -559,10 +594,14 @@ public class GUIGeneration extends HelperFunctions {
                         disp_output_path.setVisible(show_param)
                         disp_output_path.setText(output_folder_generated.toString())
                         button_select_output_path.setVisible(show_param)
-                        brain_orientation_label.setVisible(show_param)
-                        brain_orientation.setVisible(show_param)
-                        brain_orientation.setText(root_yaml_parameters.general_parameters.brain_orientation.toString())
-                        brain_orientation_comment.setVisible(show_param)
+                        input_brain_orientation_label.setVisible(show_param)
+                        input_brain_orientation.setVisible(show_param)
+                        input_brain_orientation.setText(root_yaml_parameters.general_parameters.input_brain_orientation.toString())
+                        input_brain_orientation_comment.setVisible(show_param)
+                        output_brain_orientation_label.setVisible(show_param)
+                        output_brain_orientation.setVisible(show_param)
+                        output_brain_orientation.setText(root_yaml_parameters.general_parameters.output_brain_orientation.toString())
+                        output_brain_orientation_comment.setVisible(show_param)
                         method_label.setVisible(show_param)
                         preprocessing.setVisible(show_param)
                         preprocessing.setSelected(root_yaml_parameters.general_parameters.preprocessing)
@@ -585,9 +624,9 @@ public class GUIGeneration extends HelperFunctions {
                         if (use_fast_fusion.isSelected()){
                             fusion_method_label.setVisible(show_param)
                             fusion_method.setVisible(show_param)
-                            frame.setSize(width,height+9*30)
+                            frame.setSize(width,height+10*30)
                         } else {
-                            frame.setSize(width,height+8*30)
+                            frame.setSize(width,height+9*30)
                         }
                         output_format_label.setVisible(show_param)
                         save_2D.setVisible(show_param)
@@ -599,6 +638,7 @@ public class GUIGeneration extends HelperFunctions {
                         resaving_hdf5_chunk_sizes.setText(root_yaml_parameters.resaving_parameters.hdf5_chunk_sizes.toString())
                         channel_align_downsampling.setText(root_yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ.toString())
                         channel_align_filter_minR.setValue(root_yaml_parameters.channel_alignment_parameters.filter_min_r)
+                        channel_align_optimize_fix_group.setText(root_yaml_parameters.channel_alignment_parameters.optimize_fix_group)
                         tile_align_how_to_treat_channels.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0])
                         tile_align_channels.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1])
                         tile_align_downsample.setText(root_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2].toString())
@@ -634,6 +674,8 @@ public class GUIGeneration extends HelperFunctions {
                     channel_align_downsampling.setVisible(show_param)
                     channel_align_filter_minR_label.setVisible(show_param)
                     channel_align_filter_minR.setVisible(show_param)
+                    channel_align_optimize_fix_group_label.setVisible(show_param)
+                    channel_align_optimize_fix_group.setVisible(show_param)
 
                     //Tile alignement
                     tile_align_how_to_treat_channels_label.setVisible(show_param)
@@ -712,7 +754,8 @@ public class GUIGeneration extends HelperFunctions {
                         // User clicked "Cancel" or closed the window
                         println("Add new user canceled!")
                     }
-                    output_folder_generated = new File(analysis_folder_path.getAbsolutePath() + File.separator + users_list.getSelectedItem())
+                    def current_output_folder = new File(disp_output_path.getText())
+                    output_folder_generated = new File(current_output_folder.parent + File.separator + users_list.getSelectedItem())
                     disp_output_path.setText(output_folder_generated.toString())
 
                 } else if(o == button_start) {
@@ -727,24 +770,28 @@ public class GUIGeneration extends HelperFunctions {
                     // save all GUI into edited_yaml_parameters
                     def saved_yaml_file = storeGUItoYaml()
 
-                    //SwingUtilities.invokeLater(() -> performPreprocessing(saved_yaml));
                     new Thread(() -> performPreprocessing(saved_yaml_file)).start();
 
                 } else if(o == button_cancel) {
                     //System.exit(0)
                     frame.dispose()
+
                 } else if(o == users_list) {
                     println("Editing parameters")
-                    output_folder_generated = new File(analysis_folder_path.getAbsolutePath() + File.separator + users_list.getSelectedItem())
+                    def current_output_folder = new File(disp_output_path.getText())
+                    output_folder_generated = new File(current_output_folder.parent + File.separator + users_list.getSelectedItem())
                     disp_output_path.setText(output_folder_generated.toString())
+
                 } else if(o == resave_in_hdf5) {
                     if (resave_in_hdf5.isSelected()){
                         use_fast_reader.setSelected(false)
                     }
+
                 } else if(o == use_fast_reader) {
                     if (use_fast_reader.isSelected()) {
                         resave_in_hdf5.setSelected(false)
                     }
+
                 } else if(o == use_fast_fusion) {
                     if (use_fast_fusion.isSelected()) {
                         fusion_method_label.setVisible(true)
@@ -755,6 +802,7 @@ public class GUIGeneration extends HelperFunctions {
                         fusion_method_label.setVisible(false)
                         fusion_method.setVisible(false)
                         frame.setSize(width,height+8*30)
+
                     }
                 }
             }
@@ -775,8 +823,12 @@ public class GUIGeneration extends HelperFunctions {
 
 
     static void performPreprocessing(File yaml_file) {
-        def ObjectMapper om = new ObjectMapper(new YAMLFactory())
-        def YamlParameters yaml_parameters = om.readValue(yaml_file, YamlParameters)
+        def StartTime = System.currentTimeMillis()
+        def TimeA = StartTime
+        def log_file = new ArrayList<String>()
+        def compute_time_file = new ArrayList<String>()
+        ObjectMapper om = new ObjectMapper(new YAMLFactory())
+        YamlParameters yaml_parameters = om.readValue(yaml_file, YamlParameters)
         // Create a list to store log messages
         def logMessages = []
 
@@ -789,7 +841,8 @@ public class GUIGeneration extends HelperFunctions {
         def doFuse = yaml_parameters.global_variables.use_fast_fusion
         def fusion_method = yaml_parameters.global_variables.fusion_method
         def resaving_subsampling_factors = yaml_parameters.resaving_parameters.subsampling_factors.toString().replace("[", "{").replace("]", "}")
-        println(resaving_subsampling_factors)
+        def resaving_hdf5_chunk_size = yaml_parameters.resaving_parameters.hdf5_chunk_sizes.toString().replace("[", "{").replace("]", "}")
+
         ArrayList<File> CZI_files = []
         ArrayList<File> output_folders = []
         CZI_root_folders.each {
@@ -801,38 +854,35 @@ public class GUIGeneration extends HelperFunctions {
         }
         def CZI_file = ""
         def output_dir = ""
-        //----------------------------------- Loop over the different CZI files
 
-        def StartTime = System.currentTimeMillis()
-        def TimeA = StartTime
+        //----------------------------------- Loop over the different CZI files
         for (int i = 0; i<CZI_files.size(); i++) {
             //def i = 0
             CZI_file = CZI_files[i].toString()
             output_dir = output_folders[i].toString()
             if (!output_folders[i].exists()) {
-                println("Saving in this folder: " + output_folders[i].getAbsolutePath())
+                addToLog(log_file, "Creating output folder: " + output_folders[i].getAbsolutePath())
                 output_folders[i].mkdirs()
             }
 
             def file_name = CZI_files[i].name.tokenize(".")
             def file_xml_path = output_dir + File.separator + file_name[0] + ".xml"
-            println(file_xml_path)
 
             // Loading data from CZI file--------------------------------------------------------------------------------------------------------
             // Check if the 'doResaving' flag is set to true, if so, resave in HDF5 format
             if (doFast) {
-                print("Computing script time when using the CZI Fast reader without resaving\n")
-                print("Loading/Resaving time = ")
+                addToLog(compute_time_file, "Computing script time when using the CZI Fast reader without resaving\n")
+                addToLog(compute_time_file, "Loading/Resaving time = ")
                 //logMessages.each { message -> textPanel.append(message) }
                 // Import CZI file and resave it in xml format
                 IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + CZI_file + "] output_folder=[" + output_dir + "]")
                 // Import dataset into bigsticher
                 IJ.run("BigStitcher", "browse=[" + file_xml_path + "] select=[" + file_xml_path + "]")
-                println("INFO: Fast reader DONE")
+                addToLog(log_file, "INFO: Fast reader DONE")
             } else {
                 if (doResaving) {
-                    print("Computing script time when resaving in HDF5\n")
-                    print("Loading/Resaving time = ")
+                    addToLog(compute_time_file, "Computing script time when resaving in HDF5\n")
+                    addToLog(compute_time_file, "Loading/Resaving time = ")
                     IJ.run("BigStitcher", "select=define " +
                             "define_dataset=[Automatic Loader (Bioformats based)] " +
                             "project_filename=[" + file_name[0] + ".xml] " +
@@ -844,12 +894,12 @@ public class GUIGeneration extends HelperFunctions {
                             "how_to_load_images=[Re-save as multiresolution HDF5] " +
                             "load_raw_data_virtually " +
                             "dataset_save_path=[" + output_dir + "] " +
-                            "subsampling_factors=[{ {1,1,1}, {2,2,1}, {4,4,1}, {8,8,1} }] " +
-                            "hdf5_chunk_sizes=[{ {64,64,1}, {64,32,2}, {32,32,4}, {32,32,4} }] " +
+                            "subsampling_factors=[" + resaving_subsampling_factors + "] " +
+                            "hdf5_chunk_sizes=[" + resaving_hdf5_chunk_size + "] " +
                             "timepoints_per_partition=1 setups_per_partition=0 use_deflate_compression")
                 } else {
-                    print("Computing script time without resaving\n")
-                    print("Loading/Resaving time = ")
+                    addToLog(compute_time_file, "Computing script time without resaving\n")
+                    addToLog(compute_time_file, "Loading/Resaving time = ")
                     IJ.run("BigStitcher", "select=define " +
                             "define_dataset=[Automatic Loader (Bioformats based)] " +
                             "project_filename=[" + file_name[0] + ".xml] " +
@@ -867,11 +917,11 @@ public class GUIGeneration extends HelperFunctions {
             // Record the time after resaving or not
             def TimeB = System.currentTimeMillis()
             def ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform Channel alignement-------------------------------------------------------------------------------------------------
             // Perform pairwise shift calculations
-            print("Channel Pairwise-shift time = ")
+            addToLog(compute_time_file, "Channel Pairwise-shift time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
@@ -886,27 +936,27 @@ public class GUIGeneration extends HelperFunctions {
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=[treat individually] " +
-                    "downsample_in_x=2 " +
-                    "downsample_in_y=2 " +
-                    "downsample_in_z=1")
+                    "downsample_in_x=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[0].toString() + " " +
+                    "downsample_in_y=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[1].toString() + " " +
+                    "downsample_in_z=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[2].toString())
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
             // Filter the pairwise shifts based on certain criteria
-            print("Channel Filter time = ")
+            addToLog(compute_time_file, "Channel Filter time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Filter pairwise shifts ...", "select=[" + file_xml_path + "] " +
                     "filter_by_link_quality " +
-                    "min_r=0.7 " +
+                    "min_r=" + yaml_parameters.channel_alignment_parameters.filter_min_r.toString() + " " +
                     "max_r=1")
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform global optimization and apply shifts
-            print("Channel Optimization time = ")
+            addToLog(compute_time_file, "Channel Optimization time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
@@ -923,15 +973,15 @@ public class GUIGeneration extends HelperFunctions {
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=[treat individually] " +
-                    "fix_group_0-15")
+                    yaml_parameters.channel_alignment_parameters.optimize_fix_group)
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform Tile alignement-------------------------------------------------------------------------------------------------
             // Perform pairwise shift calculations
-            print("Tile Pairwise-shift time = ")
+            addToLog(compute_time_file, "Tile Pairwise-shift time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
@@ -942,33 +992,33 @@ public class GUIGeneration extends HelperFunctions {
                     "method=[Phase Correlation] " +
                     "show_expert_grouping_options " +
                     "how_to_treat_timepoints=[treat individually] " +
-                    "how_to_treat_channels=group " +
+                    "how_to_treat_channels=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] + " " +
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=compare " +
-                    "channels=[use Channel 488] " +
-                    "downsample_in_x=4 " +
-                    "downsample_in_y=4 " +
-                    "downsample_in_z=2")
+                    "channels=[" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] + "] " +
+                    "downsample_in_x=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][0].toString() + " " +
+                    "downsample_in_y=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][1].toString() + " " +
+                    "downsample_in_z=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][2].toString())
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
             // Filter the pairwise shifts based on certain criteria
-            print("Tile Filter time = ")
+            addToLog(compute_time_file, "Tile Filter time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Filter pairwise shifts ...", "select=[" + file_xml_path + "] " +
                     "filter_by_link_quality " +
-                    "min_r=0.7 " +
+                    "min_r=" + yaml_parameters.tile_alignment_parameters.filter_min_r.toString() + " " +
                     "max_r=1")
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform global optimization and apply shifts
-            print("Tile Optimization time = ")
+            addToLog(compute_time_file, "Tile Optimization time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
@@ -984,15 +1034,15 @@ public class GUIGeneration extends HelperFunctions {
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=compare " +
-                    "fix_group_0-15")
+                    yaml_parameters.tile_alignment_parameters.optimize_fix_group)
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform ICP refinement----------------------------------------------------------------------
             // Perform ICP (Iterative Closest Point) refinement
-            print("Refinement time = ")
+            addToLog(compute_time_file, "Refinement time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("ICP Refinement ...", "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
@@ -1000,19 +1050,23 @@ public class GUIGeneration extends HelperFunctions {
                     "process_illumination=[All illuminations] " +
                     "process_tile=[All tiles] " +
                     "process_timepoint=[All Timepoints] " +
-                    "icp_refinement_type=[Simple (all together)] " +
+                    "icp_refinement_type=[" + yaml_parameters.icp_refinement_parameters.icp_refinement_type + "] " +
                     //"global_optimization_strategy=[Two-Round: Handle unconnected tiles, remove wrong links RELAXED (5.0x / 7.0px)] " +
-                    "downsampling=[Downsampling 8/8/4] " +
-                    "interest=[Average Threshold] " +
-                    "icp_max_error=[Normal Adjustment (<5px)]")
+                    "downsampling=[" + yaml_parameters.icp_refinement_parameters.downsampling + "] " +
+                    "interest=[" + yaml_parameters.icp_refinement_parameters.interest + "] " +
+                    "icp_max_error=[" + yaml_parameters.icp_refinement_parameters.icp_max_error + "]")
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
+
+
+            // Rotate sample -------------------------------------------------------------
+            /*IJ.run("Apply Transformations", "select=\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\analysis\\Axel\\MS001\\MS001.xml apply_to_angle=[All angles] apply_to_channel=[All channels] apply_to_illumination=[All illuminations] apply_to_tile=[All tiles] apply_to_timepoint=[All Timepoints] transformation=Rigid apply=[Current view transformations (appends to current transforms)]");*/
 
             // Perform fusion of data ----------------------------------------------------------------------
             // Fuse the dataset
-            print("Fusing time = ")
+            addToLog(compute_time_file, "Fusing time = ")
             TimeA = System.currentTimeMillis()
 
             if (doFuse) {
@@ -1038,22 +1092,22 @@ public class GUIGeneration extends HelperFunctions {
                         "process_tile=[All tiles] " +
                         "process_timepoint=[All Timepoints] " +
                         "bounding_box=[Currently Selected Views] " +
-                        "downsampling=1 " +
+                        "downsampling=" + yaml_parameters.general_parameters.downsampling + " " +
                         "pixel_type=[16-bit unsigned integer] " +
                         "interpolation=[Linear Interpolation] " +
                         "image=[Precompute Image] " +
                         "interest_points_for_non_rigid=[-= Disable Non-Rigid =-] " +
                         "blend " +
-                        "preserve_original " +
-                        "produce=[Each timepoint & channel] " +
-                        "fused_image=[Save as (compressed) TIFF stacks] " +
+                        yaml_parameters.fusion_parameters.preserve_original + " " +
+                        "produce=[" + yaml_parameters.fusion_parameters.produce + "] " +
+                        "fused_image=[" + yaml_parameters.fusion_parameters.fused_image + "] " +
                         "output_file_directory=[" + output_dir + "] " +
-                        "filename_addition=[]")
+                        "filename_addition=[" + yaml_parameters.fusion_parameters.filename_addition + "]")
             }
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
-            print(ComputationTime + "\n")
+            addToLog(compute_time_file, ComputationTime + "\n")
 
 
 
@@ -1068,7 +1122,7 @@ public class GUIGeneration extends HelperFunctions {
         // Record the end time for the entire computation and calculate the total time
         def EndTime = System.currentTimeMillis()
         def ComputationTime = computeTime(StartTime, EndTime)
-        print("Total computing time = " + ComputationTime + "\n")
+        addToLog(compute_time_file, "Total computing time = " + ComputationTime + "\n")
 
         // Define the filename for saving the computation times
         def computing_time_file = output_dir.toString() + File.separator + EndTime + "_Computing_times"
@@ -1086,9 +1140,12 @@ public class GUIGeneration extends HelperFunctions {
                 computing_time_file += "_noResaving.txt"
             }
         }
-
         // Save the computation times to a text file
-        IJ.run("Text...", "save=[" + computing_time_file + "]")
+        FileWriter writer = new FileWriter(computing_time_file)
+        for (String str: compute_time_file) {
+            writer.write(str)
+        }
+        writer.close()
     }
 
     /* computeTime(TimeA, TimeB) returns the time interval as min:s:ms. */
@@ -1099,6 +1156,10 @@ public class GUIGeneration extends HelperFunctions {
         def Milliseconds = ((((time_diff / 60000) - Minutes) * 60) - Seconds) * 1000
         def ComputationTime = "$Minutes:$Seconds:$Milliseconds"
         return ComputationTime
+    }
+
+    static void addToLog(ArrayList<String> logMessages, String message) {
+        logMessages.add(message)
     }
 
     def storeGUItoYaml() {
@@ -1117,7 +1178,8 @@ public class GUIGeneration extends HelperFunctions {
         edited_yaml_parameters.general_parameters.atlas_registration = registration.isSelected()
         edited_yaml_parameters.general_parameters.save_2D = save_2D.isSelected()
         edited_yaml_parameters.general_parameters.save_3D = save_3D.isSelected()
-        edited_yaml_parameters.general_parameters.brain_orientation = Arrays.asList(brain_orientation.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*"))
+        edited_yaml_parameters.general_parameters.input_brain_orientation = Arrays.asList(input_brain_orientation.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*"))
+        edited_yaml_parameters.general_parameters.output_brain_orientation = Arrays.asList(output_brain_orientation.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*"))
         edited_yaml_parameters.general_parameters.downsampling = global_downsampling.getText()
         // Define the pattern for matching items within curly braces
         Pattern pattern = Pattern.compile("\\{(.*?)\\}")
@@ -1141,9 +1203,9 @@ public class GUIGeneration extends HelperFunctions {
         edited_yaml_parameters.resaving_parameters.hdf5_chunk_sizes = hdf5_chunk_itemList
         edited_yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ = channel_align_downsampling.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*").collect(e->Integer.parseInt(e))
         edited_yaml_parameters.channel_alignment_parameters.filter_min_r = channel_align_filter_minR.getValue() as float
+        edited_yaml_parameters.channel_alignment_parameters.optimize_fix_group = channel_align_optimize_fix_group.getText()
         edited_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] = tile_align_how_to_treat_channels.getText()
         edited_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] = tile_align_channels.getText()
-
         edited_yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2] = tile_align_downsample.getText().replaceAll("[\\[\\]()]","").split("\\s*, \\s*").collect(e->Integer.parseInt(e))
         edited_yaml_parameters.tile_alignment_parameters.filter_min_r = tile_align_filter_minR.getValue() as float
         edited_yaml_parameters.tile_alignment_parameters.optimize_fix_group = tile_align_optimize_fix_group.getText()
@@ -1177,19 +1239,7 @@ GUIGeneration gd = new GUIGeneration(800, 120)
 gd.setUpGUI()
 gd.setUpButtonListeners()
 
-
-//--------------------------------------Functions-----------------------------------------------//
-
-
-public class HelperFunctions {
-    void addToLog(ArrayList<String> logMessages, String message) {
-        logMessages.add(message)
-    }
-}
-
 //---------------------------------------Classes------------------------------------------------//
-
-
 public class YamlParameters {
     GlobalVariables global_variables;
     GeneralParameters general_parameters;
@@ -1199,7 +1249,6 @@ public class YamlParameters {
     IcpRefinementParameters icp_refinement_parameters;
     FusionParameters fusion_parameters;
 }
-
 
 public class GlobalVariables {
     java.util.List<String> user_list;
@@ -1211,7 +1260,6 @@ public class GlobalVariables {
     String fusion_method;
 }
 
-
 public class GeneralParameters {
     String user;
     ArrayList<String> input_folders;
@@ -1222,7 +1270,8 @@ public class GeneralParameters {
     boolean save_3D;
     boolean preprocessing;
     boolean atlas_registration;
-    java.util.List<String> brain_orientation;
+    java.util.List<String> input_brain_orientation;
+    java.util.List<String> output_brain_orientation;
     String downsampling;
 }
 
@@ -1234,6 +1283,7 @@ public class ResavingParameters {
 public class ChannelParameters {
     java.util.List pairwise_shifts_downsamples_XYZ;
     float filter_min_r;
+    String optimize_fix_group;
 }
 
 public class TileParameters {
