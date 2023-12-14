@@ -1025,7 +1025,7 @@ public class GUIGeneration{
                     "method=[Phase Correlation] " +
                     "show_expert_grouping_options " +
                     "how_to_treat_timepoints=[treat individually] " +
-                    "how_to_treat_channels=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] + " " +
+                    //"how_to_treat_channels=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] + " " +
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=compare " +
