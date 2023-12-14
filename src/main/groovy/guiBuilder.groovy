@@ -951,6 +951,7 @@ public class GUIGeneration{
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=[treat individually] " +
+                    "channels=[use Channel Cam1] " +
                     "downsample_in_x=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[0].toString() + " " +
                     "downsample_in_y=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[1].toString() + " " +
                     "downsample_in_z=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[2].toString())
