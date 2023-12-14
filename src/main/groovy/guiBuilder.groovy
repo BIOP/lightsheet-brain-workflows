@@ -886,7 +886,8 @@ public class GUIGeneration{
 
                     addToLog(compute_time_file, "Computing script time when resaving in HDF5\n")
                     addToLog(compute_time_file, "Loading/Resaving time = ")
-                    IJ.run("BigStitcher", "select=define " +
+                    IJ.run("BigStitcher",
+                            "select=define " +
                             "define_dataset=[Automatic Loader (Bioformats based)] " +
                             "project_filename=[" + file_name[0] + ".xml] " +
                             "path=[" + CZI_file + "] " +
@@ -936,7 +937,8 @@ public class GUIGeneration{
 
             addToLog(compute_time_file, "Channel Pairwise-shift time = ")
             TimeA = System.currentTimeMillis()
-            IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
+            IJ.run("Calculate pairwise shifts ...",
+                    "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
                     "process_channel=[All channels] " +
                     "process_illumination=[All illuminations] " +
@@ -982,7 +984,8 @@ public class GUIGeneration{
 
             addToLog(compute_time_file, "Channel Optimization time = ")
             TimeA = System.currentTimeMillis()
-            IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
+            IJ.run("Optimize globally and apply shifts ...",
+                    "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
                     "process_channel=[All channels] " +
                     "process_illumination=[All illuminations] " +
@@ -1011,7 +1014,8 @@ public class GUIGeneration{
 
             addToLog(compute_time_file, "Tile Pairwise-shift time = ")
             TimeA = System.currentTimeMillis()
-            IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
+            IJ.run("Calculate pairwise shifts ...",
+                    "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
                     "process_channel=[All channels] " +
                     "process_illumination=[All illuminations] " +
@@ -1058,7 +1062,8 @@ public class GUIGeneration{
 
             addToLog(compute_time_file, "Tile Optimization time = ")
             TimeA = System.currentTimeMillis()
-            IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
+            IJ.run("Optimize globally and apply shifts ...",
+                    "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
                     "process_channel=[All channels] " +
                     "process_illumination=[All illuminations] " +
@@ -1088,7 +1093,8 @@ public class GUIGeneration{
 
             addToLog(compute_time_file, "Refinement time = ")
             TimeA = System.currentTimeMillis()
-            IJ.run("ICP Refinement ...", "select=[" + file_xml_path + "] " +
+            IJ.run("ICP Refinement ...",
+                    "select=[" + file_xml_path + "] " +
                     "process_angle=[All angles] " +
                     "process_channel=[All channels] " +
                     "process_illumination=[All illuminations] " +
@@ -1121,7 +1127,8 @@ public class GUIGeneration{
             if (doFuse) {
                 print("INFO: with fast fusion\n")
 
-                IJ.run("Fuse a BigStitcher dataset to OME-Tiff", "xml_bigstitcher_file=[" + file_xml_path + "] " +
+                IJ.run("Fuse a BigStitcher dataset to OME-Tiff",
+                        "xml_bigstitcher_file=[" + file_xml_path + "] " +
                         "output_path_directory=[" + output_dir + "] " +
                         "range_channels= " +
                         "range_slices= " +
@@ -1141,7 +1148,8 @@ public class GUIGeneration{
             } else {
                 print("INFO: with slow fusion\n")
 
-                IJ.run("Fuse dataset ...", "select=[" + file_xml_path + "] " +
+                IJ.run("Fuse dataset ...",
+                        "select=[" + file_xml_path + "] " +
                         "process_angle=[All angles] " +
                         "process_channel=[All channels] " +
                         "process_illumination=[All illuminations] " +
