@@ -996,8 +996,7 @@ public class GUIGeneration{
                     "how_to_treat_channels=compare " +
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
-                    "how_to_treat_tiles=[treat individually] " +
-                    yaml_parameters.channel_alignment_parameters.optimize_fix_group)
+                    "how_to_treat_tiles=[treat individually]") //yaml_parameters.channel_alignment_parameters.optimize_fix_group
 
             print("INFO: Channel Optimization DONE\n")
 
@@ -1025,7 +1024,7 @@ public class GUIGeneration{
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=compare " +
-                    "channels=[" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] + "] " +
+                    //"channels=[" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] + "] " +
                     "downsample_in_x=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][0].toString() + " " +
                     "downsample_in_y=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][1].toString() + " " +
                     "downsample_in_z=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][2].toString())
@@ -1068,7 +1067,8 @@ public class GUIGeneration{
                     "relative=2.500 " +
                     "absolute=3.500 " +
                     "global_optimization_strategy=[Two-Round using metadata to align unconnected Tiles] " +
-                    "show_expert_grouping_options how_to_treat_timepoints=[treat individually] " +
+                    "show_expert_grouping_options " +
+                    "how_to_treat_timepoints=[treat individually] " +
                     "how_to_treat_channels=group " +
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
