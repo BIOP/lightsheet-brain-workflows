@@ -958,6 +958,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
             // Filter the pairwise shifts based on certain criteria
             print("INFO: Channel Filter\n")
@@ -974,6 +975,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
             // Perform global optimization and apply shifts
             print("INFO: Channel Optimization\n")
@@ -1002,6 +1004,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
             // Perform Tile alignement-------------------------------------------------------------------------------------------------
             // Perform pairwise shift calculations
@@ -1032,6 +1035,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
             // Filter the pairwise shifts based on certain criteria
             print("INFO: Tile Filter\n")
@@ -1048,6 +1052,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
             // Perform global optimization and apply shifts
             print("INFO: Tile Optimization\n")
@@ -1075,6 +1080,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
             // Perform ICP refinement----------------------------------------------------------------------
             // Perform ICP (Iterative Closest Point) refinement
@@ -1099,6 +1105,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
 
             // Rotate sample -------------------------------------------------------------
@@ -1161,6 +1168,7 @@ public class GUIGeneration{
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
+            print("INFO: computation time = " + ComputationTime + "\n")
 
 
 
@@ -1176,6 +1184,7 @@ public class GUIGeneration{
         def EndTime = System.currentTimeMillis()
         def ComputationTime = computeTime(StartTime, EndTime)
         addToLog(compute_time_file, "Total computing time = " + ComputationTime + "\n")
+        print("INFO: Total computation time = " + ComputationTime + "\n")
 
         // Define the filename for saving the computation times
         def computing_time_file = output_dir.toString() + File.separator + EndTime + "_Computing_times"
