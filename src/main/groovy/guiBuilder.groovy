@@ -871,6 +871,7 @@ public class GUIGeneration{
             // Loading data from CZI file--------------------------------------------------------------------------------------------------------
             // Check if the 'doResaving' flag is set to true, if so, resave in HDF5 format
             if (doFast) {
+                print("INFO: Start Fast reader\n")
                 addToLog(compute_time_file, "Computing script time when using the CZI Fast reader without resaving\n")
                 addToLog(compute_time_file, "Loading/Resaving time = ")
                 //logMessages.each { message -> textPanel.append(message) }
@@ -878,9 +879,11 @@ public class GUIGeneration{
                 IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + CZI_file + "] output_folder=[" + output_dir + "]")
                 // Import dataset into bigsticher
                 IJ.run("BigStitcher", "browse=[" + file_xml_path + "] select=[" + file_xml_path + "]")
-                addToLog(log_file, "INFO: Fast reader DONE")
+                print("INFO: Fast reader DONE\n")
             } else {
                 if (doResaving) {
+                    print("INFO: Start resaving\n")
+
                     addToLog(compute_time_file, "Computing script time when resaving in HDF5\n")
                     addToLog(compute_time_file, "Loading/Resaving time = ")
                     IJ.run("BigStitcher", "select=define " +
@@ -897,7 +900,12 @@ public class GUIGeneration{
                             "subsampling_factors=[" + resaving_subsampling_factors + "] " +
                             "hdf5_chunk_sizes=[" + resaving_hdf5_chunk_size + "] " +
                             "timepoints_per_partition=1 setups_per_partition=0 use_deflate_compression")
+
+                    print("INFO: Resaving DONE\n")
+
                 } else {
+                    print("INFO: RAW opening in BigStitcher\n")
+
                     addToLog(compute_time_file, "Computing script time without resaving\n")
                     addToLog(compute_time_file, "Loading/Resaving time = ")
                     IJ.run("BigStitcher", "select=define " +
@@ -911,6 +919,9 @@ public class GUIGeneration{
                             "how_to_load_images=[Load raw data directly] " +
                             "load_raw_data_virtually " +
                             "dataset_save_path=[" + output_dir + "]")
+
+                    print("INFO: RAW opening in BigStitcher DONE\n")
+
                 }
             }
 
@@ -921,6 +932,8 @@ public class GUIGeneration{
 
             // Perform Channel alignement-------------------------------------------------------------------------------------------------
             // Perform pairwise shift calculations
+            print("INFO: Channel Pairwise\n")
+
             addToLog(compute_time_file, "Channel Pairwise-shift time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
@@ -940,22 +953,31 @@ public class GUIGeneration{
                     "downsample_in_y=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[1].toString() + " " +
                     "downsample_in_z=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[2].toString())
 
+            print("INFO: Channel Pairwise DONE\n")
+
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
 
             // Filter the pairwise shifts based on certain criteria
+            print("INFO: Channel Filter\n")
+
             addToLog(compute_time_file, "Channel Filter time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Filter pairwise shifts ...", "select=[" + file_xml_path + "] " +
                     "filter_by_link_quality " +
                     "min_r=" + yaml_parameters.channel_alignment_parameters.filter_min_r.toString() + " " +
                     "max_r=1")
+
+            print("INFO: Channel Filter DONE\n")
+
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform global optimization and apply shifts
+            print("INFO: Channel Optimization\n")
+
             addToLog(compute_time_file, "Channel Optimization time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
@@ -975,12 +997,16 @@ public class GUIGeneration{
                     "how_to_treat_tiles=[treat individually] " +
                     yaml_parameters.channel_alignment_parameters.optimize_fix_group)
 
+            print("INFO: Channel Optimization DONE\n")
+
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform Tile alignement-------------------------------------------------------------------------------------------------
             // Perform pairwise shift calculations
+            print("INFO: Tile Pairwise\n")
+
             addToLog(compute_time_file, "Tile Pairwise-shift time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Calculate pairwise shifts ...", "select=[" + file_xml_path + "] " +
@@ -1001,11 +1027,15 @@ public class GUIGeneration{
                     "downsample_in_y=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][1].toString() + " " +
                     "downsample_in_z=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][2].toString())
 
+            print("INFO: Tile Pairwise DONE\n")
+
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
 
             // Filter the pairwise shifts based on certain criteria
+            print("INFO: Tile Filter\n")
+
             addToLog(compute_time_file, "Tile Filter time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Filter pairwise shifts ...", "select=[" + file_xml_path + "] " +
@@ -1013,11 +1043,15 @@ public class GUIGeneration{
                     "min_r=" + yaml_parameters.tile_alignment_parameters.filter_min_r.toString() + " " +
                     "max_r=1")
 
+            print("INFO: Tile Filter DONE\n")
+
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform global optimization and apply shifts
+            print("INFO: Tile Optimization\n")
+
             addToLog(compute_time_file, "Tile Optimization time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("Optimize globally and apply shifts ...", "select=[" + file_xml_path + "] " +
@@ -1036,12 +1070,16 @@ public class GUIGeneration{
                     "how_to_treat_tiles=compare " +
                     yaml_parameters.tile_alignment_parameters.optimize_fix_group)
 
+            print("INFO: Tile Optimization DONE\n")
+
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
 
             // Perform ICP refinement----------------------------------------------------------------------
             // Perform ICP (Iterative Closest Point) refinement
+            print("INFO: ICP Refinement\n")
+
             addToLog(compute_time_file, "Refinement time = ")
             TimeA = System.currentTimeMillis()
             IJ.run("ICP Refinement ...", "select=[" + file_xml_path + "] " +
@@ -1056,6 +1094,8 @@ public class GUIGeneration{
                     "interest=[" + yaml_parameters.icp_refinement_parameters.interest + "] " +
                     "icp_max_error=[" + yaml_parameters.icp_refinement_parameters.icp_max_error + "]")
 
+            print("INFO: ICP Refinement DONE\n")
+
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
             addToLog(compute_time_file, ComputationTime + "\n")
@@ -1066,10 +1106,14 @@ public class GUIGeneration{
 
             // Perform fusion of data ----------------------------------------------------------------------
             // Fuse the dataset
+            print("INFO: Fusion\n")
+
             addToLog(compute_time_file, "Fusing time = ")
             TimeA = System.currentTimeMillis()
 
             if (doFuse) {
+                print("INFO: with fast fusion\n")
+
                 IJ.run("Fuse a BigStitcher dataset to OME-Tiff", "xml_bigstitcher_file=[" + file_xml_path + "] " +
                         "output_path_directory=[" + output_dir + "] " +
                         "range_channels= " +
@@ -1084,7 +1128,12 @@ public class GUIGeneration{
                         "z_ratio= " +
                         "use_interpolation=false " +
                         "fusion_method=[" + fusion_method + "] ")
+
+                print("INFO: with fast fusion DONE\n")
+
             } else {
+                print("INFO: with slow fusion\n")
+
                 IJ.run("Fuse dataset ...", "select=[" + file_xml_path + "] " +
                         "process_angle=[All angles] " +
                         "process_channel=[All channels] " +
@@ -1103,7 +1152,11 @@ public class GUIGeneration{
                         "fused_image=[" + yaml_parameters.fusion_parameters.fused_image + "] " +
                         "output_file_directory=[" + output_dir + "] " +
                         "filename_addition=[" + yaml_parameters.fusion_parameters.filename_addition + "]")
+
+                print("INFO: with slow fusion DONE\n")
             }
+
+            print("INFO: Fusion DONE\n")
 
             TimeB = System.currentTimeMillis()
             ComputationTime = computeTime(TimeA, TimeB)
@@ -1146,6 +1199,8 @@ public class GUIGeneration{
             writer.write(str)
         }
         writer.close()
+
+        print("INFO: Comuting time successfully stored!\n")
     }
 
     /* computeTime(TimeA, TimeB) returns the time interval as min:s:ms. */
