@@ -5,6 +5,10 @@ import java.awt.event.ActionListener
 import java.awt.event.ActionEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 //import ch.epfl.classes.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -1180,13 +1184,17 @@ public class GUIGeneration{
             print("INFO: computation time = " + ComputationTime + "\n")
 
             // Record the end time for the entire computation and calculate the total time
-            def EndTime = System.currentTimeMillis()
-            def ComputationTime = computeTime(StartTime, EndTime)
+            ComputationTime = computeTime(StartTime, TimeB)
             addToLog(compute_time_file, "Total computing time = " + ComputationTime + "\n")
             print("INFO: Total computation time = " + ComputationTime + "\n")
 
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss")
+            LocalDateTime now = LocalDateTime.now()
+
+            def date_and_time = dtf.format(now)
+
             // Define the filename for saving the computation times
-            def computing_time_file = output_dir.toString() + File.separator + EndTime + "_Computing_times"
+            def computing_time_file = output_dir.toString() + File.separator + date_and_time + "_Computing_times"
 
             if (doFuse) {
                 computing_time_file += "_FastFusion"
@@ -1220,9 +1228,9 @@ public class GUIGeneration{
     /* computeTime(TimeA, TimeB) returns the time interval as min:s:ms. */
     static GString computeTime(long TimeA, long TimeB) {
         def time_diff = TimeB - TimeA
-        def Minutes = Math.floor(time_diff / 60000 as double)
-        def Seconds = Math.floor(((time_diff / 60000) - Minutes) * 60)
-        def Milliseconds = ((((time_diff / 60000) - Minutes) * 60) - Seconds) * 1000
+        def Minutes = Math.floor(time_diff / 60000 as double).toInteger()
+        def Seconds = Math.floor(((time_diff / 60000) - Minutes) * 60).toInteger()
+        def Milliseconds = (((((time_diff / 60000) - Minutes) * 60) - Seconds) * 1000).toInteger()
         def ComputationTime = "$Minutes:$Seconds:$Milliseconds"
         return ComputationTime
     }
