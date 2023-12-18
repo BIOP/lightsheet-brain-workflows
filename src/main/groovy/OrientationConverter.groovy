@@ -10,9 +10,25 @@ ArrayList<int> output_positions = []
 
 def input_orientation = "sal"
 
-def output_orientation = "lai"
+def output_orientation = "lsa"
 
 for (int i=0; i<input_orientation.size(); i++) {
+	
+	input_positions.add(input_orientation.indexOf(input_orientation[i]))
+	if (output_orientation.contains(input_orientation[i])){
+		output_positions.add(output_orientation.indexOf(input_orientation[i]))
+	} else {
+		for (int j = 0; j<3; j++){
+			if ( all_axis[j].contains(input_orientation[i])){
+				def temp_axis = all_axis[j]
+				temp_axis.remove(input_orientation[i])
+				print("Opposite letter of " + input_orientation[i] + " is " + temp_axis[0] +"\n")
+			}
+		}
+	}
+	
+	
+	
 	if (output_orientation.contains(input_orientation[i])) {
 		letters.add(input_orientation[i])
 		input_positions.add(input_orientation.indexOf(input_orientation[i]))
