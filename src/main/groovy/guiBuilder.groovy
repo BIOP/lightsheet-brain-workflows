@@ -1188,7 +1188,7 @@ public class GUIGeneration{
             addToLog(compute_time_file, "Total computing time = " + ComputationTime + "\n")
             print("INFO: Total computation time = " + ComputationTime + "\n")
 
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss")
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss")
             LocalDateTime now = LocalDateTime.now()
 
             def date_and_time = dtf.format(now)
