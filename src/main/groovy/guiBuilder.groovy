@@ -1029,7 +1029,7 @@ public class GUIGeneration{
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=compare " +
-                    "channels=[use Channel Cam1] " + //"channels=[" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] + "] " +
+                    "channels=[" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] + "] " +
                     "downsample_in_x=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][0].toString() + " " +
                     "downsample_in_y=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][1].toString() + " " +
                     "downsample_in_z=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][2].toString())
