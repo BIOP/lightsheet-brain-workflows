@@ -1,3 +1,16 @@
+/*
+TO DO:
+1) Rotation of the brain and resaving "sal" to "asr"
+2) Saving data in 3D stacks or 2D images (one folder per channel with all the slices in it) either after BigStitcher
+3) Include Atlas warped to data with BrainReg script (as a last step) -> first deliverable done on workstations (BOP or FLPL) in mid to end Jan 2024
+4) Have a parameters.yml for each brain to look for with Snakemake
+5) modify this script to launch it in a cmd line
+6) Embedd this into docker container with GUI
+7) Make a lighter docker without GUI to run multiple nodes.
+8) Make the Snakemake workflow/file
+9) Document and comment the code to understand groovy scripts
+ */
+
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.*
 import java.awt.*
