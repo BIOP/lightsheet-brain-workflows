@@ -1179,46 +1179,42 @@ public class GUIGeneration{
             addToLog(compute_time_file, ComputationTime + "\n")
             print("INFO: computation time = " + ComputationTime + "\n")
 
+            // Record the end time for the entire computation and calculate the total time
+            def EndTime = System.currentTimeMillis()
+            def ComputationTime = computeTime(StartTime, EndTime)
+            addToLog(compute_time_file, "Total computing time = " + ComputationTime + "\n")
+            print("INFO: Total computation time = " + ComputationTime + "\n")
 
+            // Define the filename for saving the computation times
+            def computing_time_file = output_dir.toString() + File.separator + EndTime + "_Computing_times"
 
-            // Print the log at the end
-            //logMessages.each { message -> IJ.log(message) }
-            //return
+            if (doFuse) {
+                computing_time_file += "_FastFusion"
+            }
 
-            // Print the log at the end
-            //logMessages.each { message -> IJ.log(message) }
+            if (doFast) {
+                computing_time_file += "_FastReader_noResaving.txt"
+            } else {
+                if (doResaving) {
+                    computing_time_file += "_HDF5_Resaving.txt"
+                } else {
+                    computing_time_file += "_noResaving.txt"
+                }
+            }
+            // Save the computation times to a text file
+            FileWriter writer = new FileWriter(computing_time_file)
+            for (String str: compute_time_file) {
+                writer.write(str)
+            }
+            writer.close()
+
+            print("INFO: Comuting time successfully stored!\n")
         }
 
-        // Record the end time for the entire computation and calculate the total time
+        print("INFO: Batch processing done!\n")
         def EndTime = System.currentTimeMillis()
         def ComputationTime = computeTime(StartTime, EndTime)
-        addToLog(compute_time_file, "Total computing time = " + ComputationTime + "\n")
         print("INFO: Total computation time = " + ComputationTime + "\n")
-
-        // Define the filename for saving the computation times
-        def computing_time_file = output_dir.toString() + File.separator + EndTime + "_Computing_times"
-
-        if (doFuse) {
-            computing_time_file += "_FastFusion"
-        }
-
-        if (doFast) {
-            computing_time_file += "_FastReader_noResaving.txt"
-        } else {
-            if (doResaving) {
-                computing_time_file += "_HDF5_Resaving.txt"
-            } else {
-                computing_time_file += "_noResaving.txt"
-            }
-        }
-        // Save the computation times to a text file
-        FileWriter writer = new FileWriter(computing_time_file)
-        for (String str: compute_time_file) {
-            writer.write(str)
-        }
-        writer.close()
-
-        print("INFO: Comuting time successfully stored!\n")
     }
 
     /* computeTime(TimeA, TimeB) returns the time interval as min:s:ms. */
