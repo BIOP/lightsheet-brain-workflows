@@ -1,4 +1,4 @@
-/*import net.imagej.ImageJ;
+import net.imagej.ImageJ;
 
 public class SimpleIJLaunch {
 
@@ -7,4 +7,3 @@ public class SimpleIJLaunch {
         ij.ui().showUI();
     }
 }
-*/

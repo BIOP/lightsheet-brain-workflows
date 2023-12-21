@@ -734,8 +734,6 @@ public class GUIGeneration{
                     czi_input_chooser.setCurrentDirectory(new File(czi_base_file.getAbsolutePath()))
                     czi_input_chooser.setMultiSelectionEnabled(true)
                     czi_input_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-                    /*def cziFilter = new FileNameExtensionFilter("CIZ Files (*.czi)", "czi")
-                    czi_input_chooser.fileFilter = cziFilter*/
 
                     int response = czi_input_chooser.showOpenDialog(null)
 
@@ -840,8 +838,6 @@ public class GUIGeneration{
 
 
     static void performPreprocessing(File yaml_file) {
-        def StartTime = System.currentTimeMillis()
-        def TimeA = StartTime
         def log_file = new ArrayList<String>()
         def compute_time_file = new ArrayList<String>()
         ObjectMapper om = new ObjectMapper(new YAMLFactory())
@@ -874,7 +870,9 @@ public class GUIGeneration{
 
         //----------------------------------- Loop over the different CZI files
         for (int i = 0; i<CZI_files.size(); i++) {
-            //def i = 0
+            log_file = new ArrayList<String>()
+            def StartTime = System.currentTimeMillis()
+            def TimeA = StartTime
             CZI_file = CZI_files[i].toString()
             output_dir = output_folders[i].toString()
             if (!output_folders[i].exists()) {
@@ -1131,12 +1129,12 @@ public class GUIGeneration{
             addToLog(compute_time_file, ComputationTime + "\n")
             print("INFO: computation time = " + ComputationTime + "\n")
 
-
             // Rotate sample -------------------------------------------------------------
-            /*IJ.run("Apply Transformations", "select=\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\analysis\\Axel\\MS001\\MS001.xml apply_to_angle=[All angles] apply_to_channel=[All channels] apply_to_illumination=[All illuminations] apply_to_tile=[All tiles] apply_to_timepoint=[All Timepoints] transformation=Rigid apply=[Current view transformations (appends to current transforms)]");*/
+            //IJ.run("Apply Transformations", "select=\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\analysis\\Axel\\MS001\\MS001.xml apply_to_angle=[All angles] apply_to_channel=[All channels] apply_to_illumination=[All illuminations] apply_to_tile=[All tiles] apply_to_timepoint=[All Timepoints] transformation=Rigid apply=[Current view transformations (appends to current transforms)]")
 
             // Perform fusion of data ----------------------------------------------------------------------
             // Fuse the dataset
+
             print("INFO: Fusion\n")
 
             addToLog(compute_time_file, "Fusing time = ")
@@ -1237,8 +1235,9 @@ public class GUIGeneration{
         def ComputationTime = computeTime(StartTime, EndTime)
         print("INFO: Total computation time = " + ComputationTime + "\n")
     }
+    // computeTime(TimeA, TimeB) returns the time interval as min:s:ms.
 
-    /* computeTime(TimeA, TimeB) returns the time interval as min:s:ms. */
+
     static GString computeTime(long TimeA, long TimeB) {
         def time_diff = TimeB - TimeA
         def Minutes = Math.floor(time_diff / 60000 as double).toInteger()
@@ -1330,6 +1329,8 @@ gd.setUpGUI()
 gd.setUpButtonListeners()
 
 //---------------------------------------Classes------------------------------------------------//
+
+/*
 public class YamlParameters {
     GlobalVariables global_variables;
     GeneralParameters general_parameters;
@@ -1395,3 +1396,4 @@ public class FusionParameters {
     String fused_image;
     String filename_addition;
 }
+*/
