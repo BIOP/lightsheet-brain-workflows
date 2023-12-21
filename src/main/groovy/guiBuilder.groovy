@@ -967,10 +967,11 @@ public class GUIGeneration{
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=[treat individually] " +
-                    //"channels=[use Channel Cam1] " +
                     "downsample_in_x=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[0].toString() + " " +
                     "downsample_in_y=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[1].toString() + " " +
-                    "downsample_in_z=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[2].toString())
+                    "downsample_in_z=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[2].toString()
+            )
+            //"channels=[use Channel Cam1] " +
 
             print("INFO: Channel Pairwise DONE\n")
 
@@ -1041,14 +1042,14 @@ public class GUIGeneration{
                     "method=[Phase Correlation] " +
                     "show_expert_grouping_options " +
                     "how_to_treat_timepoints=[treat individually] " +
-                    //"how_to_treat_channels=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] + " " +
                     "how_to_treat_illuminations=group " +
                     "how_to_treat_angles=[treat individually] " +
                     "how_to_treat_tiles=compare " +
                     "channels=[" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[1] + "] " +
                     "downsample_in_x=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][0].toString() + " " +
                     "downsample_in_y=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][1].toString() + " " +
-                    "downsample_in_z=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][2].toString())
+                    "downsample_in_z=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][2].toString()
+            ) //"how_to_treat_channels=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] + " " +
 
             print("INFO: Tile Pairwise DONE\n")
 
@@ -1269,7 +1270,7 @@ public class GUIGeneration{
         edited_yaml_parameters.general_parameters.save_3D = save_3D.isSelected()
         edited_yaml_parameters.general_parameters.input_brain_orientation = Arrays.asList(input_brain_orientation.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*"))
         edited_yaml_parameters.general_parameters.output_brain_orientation = Arrays.asList(output_brain_orientation.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*"))
-        edited_yaml_parameters.general_parameters.downsampling = global_downsampling.getText().toString()
+        edited_yaml_parameters.general_parameters.downsampling = global_downsampling.getText()
         // Define the pattern for matching items within curly braces
         Pattern pattern = Pattern.compile("\\{(.*?)\\}")
         // Create a matcher for the input string
