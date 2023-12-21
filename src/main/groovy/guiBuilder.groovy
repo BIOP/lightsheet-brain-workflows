@@ -1172,7 +1172,7 @@ public class GUIGeneration{
                         "process_tile=[All tiles] " +
                         "process_timepoint=[All Timepoints] " +
                         "bounding_box=[Currently Selected Views] " +
-                        "downsampling=" + yaml_parameters.general_parameters.downsampling + " " +
+                        "downsampling=" + yaml_parameters.general_parameters.downsampling.toString() + " " +
                         "pixel_type=[16-bit unsigned integer] " +
                         "interpolation=[Linear Interpolation] " +
                         "image=[Precompute Image] " +
@@ -1330,7 +1330,7 @@ gd.setUpButtonListeners()
 
 //---------------------------------------Classes------------------------------------------------//
 
-/*
+
 public class YamlParameters {
     GlobalVariables global_variables;
     GeneralParameters general_parameters;
@@ -1396,4 +1396,4 @@ public class FusionParameters {
     String fused_image;
     String filename_addition;
 }
-*/
+
