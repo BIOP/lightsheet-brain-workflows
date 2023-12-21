@@ -867,6 +867,7 @@ public class GUIGeneration{
         }
         def CZI_file = ""
         def output_dir = ""
+        def MainStartTime = System.currentTimeMillis()
 
         //----------------------------------- Loop over the different CZI files
         for (int i = 0; i<CZI_files.size(); i++) {
@@ -1232,12 +1233,11 @@ public class GUIGeneration{
 
         print("INFO: Batch processing done!\n")
         def EndTime = System.currentTimeMillis()
-        def ComputationTime = computeTime(StartTime, EndTime)
+        def ComputationTime = computeTime(MainStartTime, EndTime)
         print("INFO: Total computation time = " + ComputationTime + "\n")
     }
+
     // computeTime(TimeA, TimeB) returns the time interval as min:s:ms.
-
-
     static GString computeTime(long TimeA, long TimeB) {
         def time_diff = TimeB - TimeA
         def Minutes = Math.floor(time_diff / 60000 as double).toInteger()
@@ -1329,8 +1329,6 @@ gd.setUpGUI()
 gd.setUpButtonListeners()
 
 //---------------------------------------Classes------------------------------------------------//
-
-
 public class YamlParameters {
     GlobalVariables global_variables;
     GeneralParameters general_parameters;
