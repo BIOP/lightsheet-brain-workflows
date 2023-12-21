@@ -669,6 +669,7 @@ public class GUIGeneration{
                         fusion_produce.setText(root_yaml_parameters.fusion_parameters.produce)
                         fused_image.setText(root_yaml_parameters.fusion_parameters.fused_image)
                         filename_addition.setText(root_yaml_parameters.fusion_parameters.filename_addition)
+                        global_downsampling.setText(root_yaml_parameters.general_parameters.downsampling)
                     } else {
                         // User canceled the file selection
                         println("File selection canceled by the user.")
@@ -678,7 +679,6 @@ public class GUIGeneration{
                     show_param = true
                     global_downsampling_label.setVisible(show_param)
                     global_downsampling.setVisible(show_param)
-                    global_downsampling.setText(root_yaml_parameters.general_parameters.downsampling)
 
                     //Resaving
                     resaving_subsampling_factors_label.setVisible(show_param)
