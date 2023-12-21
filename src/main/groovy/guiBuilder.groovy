@@ -1269,7 +1269,7 @@ public class GUIGeneration{
         edited_yaml_parameters.general_parameters.save_3D = save_3D.isSelected()
         edited_yaml_parameters.general_parameters.input_brain_orientation = Arrays.asList(input_brain_orientation.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*"))
         edited_yaml_parameters.general_parameters.output_brain_orientation = Arrays.asList(output_brain_orientation.getText().replaceAll("[\\[\\](){}]","").split("\\s*, \\s*"))
-        edited_yaml_parameters.general_parameters.downsampling = global_downsampling.getText()
+        edited_yaml_parameters.general_parameters.downsampling = global_downsampling.getText().toString()
         // Define the pattern for matching items within curly braces
         Pattern pattern = Pattern.compile("\\{(.*?)\\}")
         // Create a matcher for the input string
