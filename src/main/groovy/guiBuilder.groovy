@@ -8,7 +8,7 @@ TO DO:
 6) Embedd this into docker container with GUI
 7) Make a lighter docker without GUI to run multiple nodes.
 8) Make the Snakemake workflow/file
-9) Document and comment the code to understand groovy scripts
+9) Test, computation time for large dataset.
  */
 
 import javax.swing.filechooser.FileNameExtensionFilter
