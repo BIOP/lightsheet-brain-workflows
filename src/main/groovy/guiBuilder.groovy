@@ -138,11 +138,12 @@ public class GUIGeneration{
     private JTextField filename_addition
 
 
-    //
+    // Start and Cancel buttons of the GUI
     private JButton button_start
     private JButton button_cancel
 
     public GUIGeneration(int w, int h) {
+        //Initialization of the GUI fields
         frame = new JFrame()
         int textfield_length = 20
         panel= new JPanel()
@@ -150,7 +151,7 @@ public class GUIGeneration{
         scrollPane = new JScrollPane(panel)
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
 
-        //General cariables
+        //General variables
         label_yaml_param = new JLabel("Select YAML file")
         disp_yaml_param = new JTextField(textfield_length)
         button_select_yaml = new JButton("Select")
@@ -204,6 +205,7 @@ public class GUIGeneration{
         channel_align_downsampling_label = new JLabel("Channel downsampling [x,y,z]")
         channel_align_downsampling = new JTextField(textfield_length)
         channel_align_filter_minR_label = new JLabel("Channel filter min R")
+        // Parameters needed to make the Spinner work
         def BigDecimal max_value = 1.0
         def BigDecimal min_value = 0.0
         def BigDecimal step_size = 0.1
@@ -255,6 +257,7 @@ public class GUIGeneration{
     }
 
     public void setUpGUI() {
+        //Draw the GUI using BorderLayout for the Scroll bar and GridBagLayout for the GUI fields
         Container cp = frame.getContentPane()
         BorderLayout brdr = new BorderLayout()
         GridBagLayout gbl = new GridBagLayout()
@@ -265,9 +268,10 @@ public class GUIGeneration{
         frame.setTitle("Parameter selection")
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
 
+        // Adding a scroll bar
         cp.add(scrollPane, BorderLayout.CENTER)
-        //cp.add(panel, BorderLayout.PAGE_START)
 
+        // Populate the GUI with the different fields
         gbc.insets = new Insets(5,5,5,5)
 
         gbc.gridx = 0
@@ -483,6 +487,7 @@ public class GUIGeneration{
         gbc.gridx = 3
         panel.add(button_cancel, gbc)
 
+        //Hide fields and buttons according to what is needed
         show_param = false
 
         button_edit_yaml.setVisible(show_param)
@@ -573,12 +578,15 @@ public class GUIGeneration{
     }
 
     public void setUpButtonListeners() {
+        // According to user activity the GUI will read the YAML file and write the corresponding values in the GUI field
         ActionListener buttonListener = new ActionListener() {
             @Override // Override existing function actionPerformed
             void actionPerformed(ActionEvent ae) {
+                //One function to detect all user inputs as object
                 Object o = ae.getSource()
-                println(o.toString())
+                //println(o.toString())
                 if(o == button_select_yaml) {
+                    //Open YAML file
                     yaml_chooser = new JFileChooser()
                     yaml_chooser.setCurrentDirectory(new File("\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\analysis"))
                     def yamlFilter = new FileNameExtensionFilter("YAML Files (*.yaml, *.yml)", "yaml", "yml")
@@ -587,13 +595,17 @@ public class GUIGeneration{
                     int response = yaml_chooser.showOpenDialog(null)
 
                     if(response == JFileChooser.APPROVE_OPTION) {
+                        //Get YAML file path
                         File yaml_file = new File(yaml_chooser.getSelectedFile().getAbsolutePath())
                         disp_yaml_param.setText(yaml_file.getAbsolutePath())
 
                         // Instantiating a new ObjectMapper as a YAMLFactory
                         om = new ObjectMapper(new YAMLFactory())
+                        //Read YAML and stor it in a YamlParamaeters class
                         root_yaml_parameters = om.readValue(yaml_file, YamlParameters)
                         edited_yaml_parameters = om.readValue(yaml_file, YamlParameters)
+
+                        //Show relevant GUI fields and intitialize them with data from YAML file
                         show_param = true
                         button_edit_yaml.setVisible(show_param)
                         users_label.setVisible(show_param)
@@ -675,6 +687,7 @@ public class GUIGeneration{
                         println("File selection canceled by the user.")
                     }
                 } else if(o == button_edit_yaml) {
+                    //Allow editing of the values read in the YAML file by showing all GUI fields
                     println("Editing parameters")
                     show_param = true
                     global_downsampling_label.setVisible(show_param)
@@ -728,11 +741,12 @@ public class GUIGeneration{
                     frame.setSize(width,height+gbc_ypos*30)
 
                 } else if(o == button_select_czi_folders) {
+                    //Selecting the folders containing the CZI file for each mouse brain
                     println("Select czi")
                     File czi_base_file = new File(root_yaml_parameters.global_variables.raw_data_server.toString())
                     czi_input_chooser = new JFileChooser()
                     czi_input_chooser.setCurrentDirectory(new File(czi_base_file.getAbsolutePath()))
-                    czi_input_chooser.setMultiSelectionEnabled(true)
+                    czi_input_chooser.setMultiSelectionEnabled(true) //Allows multiple folder selection
                     czi_input_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
 
                     int response = czi_input_chooser.showOpenDialog(null)
@@ -743,6 +757,7 @@ public class GUIGeneration{
                         disp_czi_folders.setText(czi_file_name.toString())
                     }
                 } else if(o == button_select_output_path) {
+                    //Output path is automatically generated but you can modify it here
                     println("Select output")
                     output_chooser = new JFileChooser()
                     output_chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY);
@@ -754,12 +769,12 @@ public class GUIGeneration{
                     }
                 } else if(o == button_add_users) {
                     println("Add user")
-                    // Open a popup window to get user input
+                    // Open a popup window to get user input in order to create a new user
                     def userInput = JOptionPane.showInputDialog("Enter a new user name:")
 
                     // Check if the user clicked "OK" or "Cancel"
                     if (userInput != null) {
-                        // User entered a string
+                        // Store new user in root YAML file
                         root_yaml_parameters.global_variables.user_list.add(userInput)
                         users_list.model = new DefaultComboBoxModel<String>(root_yaml_parameters.global_variables.user_list.toArray(new String[0]))
                         users_list.setSelectedItem(userInput)
@@ -774,7 +789,7 @@ public class GUIGeneration{
                     disp_output_path.setText(output_folder_generated.toString())
 
                 } else if(o == button_start) {
-               
+                    // Upon Start button activation a new YAML file will be created and the corresponding analysis will be performed
                     JOptionPane.showMessageDialog(
                             null,               // Parent component (null for no parent)
                             "Validate starting the analysis?",   // Message to display
@@ -792,17 +807,20 @@ public class GUIGeneration{
                     frame.dispose()
 
                 } else if(o == users_list) {
+                    //If a user is selected in the list the new user will generate a new output
                     println("Editing parameters")
                     def current_output_folder = new File(disp_output_path.getText())
                     output_folder_generated = new File(current_output_folder.parent + File.separator + users_list.getSelectedItem())
                     disp_output_path.setText(output_folder_generated.toString())
 
                 } else if(o == resave_in_hdf5) {
+                    //Mutual exclusion of HDF5 resaving and Fast CZI reader otpion
                     if (resave_in_hdf5.isSelected()){
                         use_fast_reader.setSelected(false)
                     }
 
                 } else if(o == use_fast_reader) {
+                    //Mutual exclusion of HDF5 resaving and Fast CZI reader otpion
                     if (use_fast_reader.isSelected()) {
                         resave_in_hdf5.setSelected(false)
                     }
@@ -823,6 +841,7 @@ public class GUIGeneration{
             }
         }
 
+        //Add the action listener to each button
         button_select_yaml.addActionListener(buttonListener)
         button_edit_yaml.addActionListener(buttonListener)
         button_select_czi_folders.addActionListener(buttonListener)
@@ -838,12 +857,12 @@ public class GUIGeneration{
 
 
     static void performPreprocessing(File yaml_file) {
-        def log_file = new ArrayList<String>()
-        def compute_time_file = new ArrayList<String>()
+        //Initialize global variables for the function
+        def compute_time_file = new ArrayList<String>() //To generate an output text file with the computing times of the pre-processing script
         ObjectMapper om = new ObjectMapper(new YAMLFactory())
         YamlParameters yaml_parameters = om.readValue(yaml_file, YamlParameters)
+
         // Create a list to store log messages
-        def logMessages = []
 
         //Initialize variables from YAML file
         def raw_data_server_path = new File(yaml_parameters.global_variables.raw_data_server)
@@ -877,7 +896,6 @@ public class GUIGeneration{
             CZI_file = CZI_files[i].toString()
             output_dir = output_folders[i].toString()
             if (!output_folders[i].exists()) {
-                addToLog(log_file, "Creating output folder: " + output_folders[i].getAbsolutePath())
                 output_folders[i].mkdirs()
             }
 
@@ -890,7 +908,6 @@ public class GUIGeneration{
                 print("INFO: Start Fast reader\n")
                 addToLog(compute_time_file, "Computing script time when using the CZI Fast reader without resaving\n")
                 addToLog(compute_time_file, "Loading/Resaving time = ")
-                //logMessages.each { message -> textPanel.append(message) }
                 // Import CZI file and resave it in xml format
                 IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + CZI_file + "] output_folder=[" + output_dir + "]")
                 // Import dataset into bigsticher
@@ -971,7 +988,7 @@ public class GUIGeneration{
                     "downsample_in_y=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[1].toString() + " " +
                     "downsample_in_z=" + yaml_parameters.channel_alignment_parameters.pairwise_shifts_downsamples_XYZ[2].toString()
             )
-            //"channels=[use Channel Cam1] " +
+            //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " +
 
             print("INFO: Channel Pairwise DONE\n")
 
@@ -1049,7 +1066,7 @@ public class GUIGeneration{
                     "downsample_in_x=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][0].toString() + " " +
                     "downsample_in_y=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][1].toString() + " " +
                     "downsample_in_z=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[2][2].toString()
-            ) //"how_to_treat_channels=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] + " " +
+            ) // I had to remove this as it was giving me errors -> "how_to_treat_channels=" + yaml_parameters.tile_alignment_parameters.pairwise_shifts_parameters[0] + " " +
 
             print("INFO: Tile Pairwise DONE\n")
 
@@ -1119,7 +1136,7 @@ public class GUIGeneration{
                     "process_tile=[All tiles] " +
                     "process_timepoint=[All Timepoints] " +
                     "icp_refinement_type=[" + yaml_parameters.icp_refinement_parameters.icp_refinement_type + "] " +
-                    //"global_optimization_strategy=[Two-Round: Handle unconnected tiles, remove wrong links RELAXED (5.0x / 7.0px)] " +
+                    //This was set in the macro recorder but not in LSENS code so I removed it -> "global_optimization_strategy=[Two-Round: Handle unconnected tiles, remove wrong links RELAXED (5.0x / 7.0px)] " +
                     "downsampling=[" + yaml_parameters.icp_refinement_parameters.downsampling + "] " +
                     "interest=[" + yaml_parameters.icp_refinement_parameters.interest + "] " +
                     "icp_max_error=[" + yaml_parameters.icp_refinement_parameters.icp_max_error + "]")
@@ -1131,7 +1148,7 @@ public class GUIGeneration{
             addToLog(compute_time_file, ComputationTime + "\n")
             print("INFO: computation time = " + ComputationTime + "\n")
 
-            // Rotate sample -------------------------------------------------------------
+            // Rotate sample ----------TO DO!!!!!!!!
             //IJ.run("Apply Transformations", "select=\\\\sv-nas1.rcp.epfl.ch\\ptbiop-raw\\temp-Lorenzo\\Petersen-Lab\\analysis\\Axel\\MS001\\MS001.xml apply_to_angle=[All angles] apply_to_channel=[All channels] apply_to_illumination=[All illuminations] apply_to_tile=[All tiles] apply_to_timepoint=[All Timepoints] transformation=Rigid apply=[Current view transformations (appends to current transforms)]")
 
             // Perform fusion of data ----------------------------------------------------------------------
@@ -1253,6 +1270,7 @@ public class GUIGeneration{
     }
 
     def storeGUItoYaml() {
+        //Save all the GUI state to a YAML file
         int userlist_size = users_list.getItemCount()
         ArrayList user_list_items = new ArrayList()
         for (int i=0; i<userlist_size; i++) {
