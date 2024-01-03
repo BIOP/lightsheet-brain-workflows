@@ -890,7 +890,7 @@ public class GUIGeneration{
 
         //----------------------------------- Loop over the different CZI files
         for (int i = 0; i<CZI_files.size(); i++) {
-            log_file = new ArrayList<String>()
+            def log_file = new ArrayList<String>()
             def StartTime = System.currentTimeMillis()
             def TimeA = StartTime
             CZI_file = CZI_files[i].toString()
