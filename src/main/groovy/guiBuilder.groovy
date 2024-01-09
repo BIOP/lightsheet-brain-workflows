@@ -1,6 +1,6 @@
 /*
 TO DO:
-1) Rotation of the brain and resaving "sal" to "asr"
+1) Rotation of the brain and resaving "ial" to "asr" (ie horizontal to coronal view)
 2) Saving data in 3D stacks or 2D images (one folder per channel with all the slices in it) either after BigStitcher
 3) Include Atlas warped to data with BrainReg script (as a last step) -> first deliverable done on workstations (BOP or FLPL) in mid to end Jan 2024
 4) Have a parameters.yml for each brain to look for with Snakemake
@@ -614,7 +614,8 @@ public class GUIGeneration{
                         users_list.setSelectedItem(root_yaml_parameters.general_parameters.user)
                         button_add_users.setVisible(show_param)
                         analysis_folder_path = new File(root_yaml_parameters.global_variables.analysis_server)
-                        output_folder_generated = new File(analysis_folder_path.getAbsolutePath() + File.separator + users_list.getSelectedItem())
+                        //CHANGED HERE output_folder_generated = new File(analysis_folder_path.getAbsolutePath() + File.separator + users_list.getSelectedItem())
+                        output_folder_generated = new File(analysis_folder_path.getAbsolutePath() + File.separator)
                         label_czi_folders.setVisible(show_param)
                         disp_czi_folders.setVisible(show_param)
                         disp_czi_folders.setText(root_yaml_parameters.general_parameters.input_folders.toString())
@@ -878,9 +879,11 @@ public class GUIGeneration{
         ArrayList<File> CZI_files = []
         ArrayList<File> output_folders = []
         CZI_root_folders.each {
-            def input_path_name = raw_data_server_path.getAbsolutePath()+File.separator+it.toString()+File.separator+"Anatomy"+File.separator+it.toString()+".czi"
+            //def input_path_name = raw_data_server_path.getAbsolutePath()+File.separator+it.toString()+File.separator+"Anatomy"+File.separator+it.toString()+".czi"
+            def input_path_name = raw_data_server_path.getAbsolutePath()+File.separator+it.toString()+File.separator+it.toString()+".czi"
             def output_path_name = output_server_path.getAbsolutePath()+File.separator+it.toString()
             println(input_path_name)
+            println(output_path_name)
             CZI_files.add(new File(input_path_name))
             output_folders.add(new File(output_path_name))
         }
@@ -901,6 +904,7 @@ public class GUIGeneration{
 
             def file_name = CZI_files[i].name.tokenize(".")
             def file_xml_path = output_dir + File.separator + file_name[0] + ".xml"
+            println(file_xml_path)
 
             // Loading data from CZI file--------------------------------------------------------------------------------------------------------
             // Check if the 'doResaving' flag is set to true, if so, resave in HDF5 format
@@ -1246,7 +1250,7 @@ public class GUIGeneration{
             }
             writer.close()
 
-            print("INFO: Comuting time successfully stored!\n")
+            print("INFO: Computing time successfully stored!\n")
         }
 
         print("INFO: Batch processing done!\n")
@@ -1325,16 +1329,19 @@ public class GUIGeneration{
         edited_yaml_parameters.fusion_parameters.produce = fusion_produce.getText()
         edited_yaml_parameters.fusion_parameters.fused_image = fused_image.getText()
         edited_yaml_parameters.fusion_parameters.filename_addition = filename_addition.getText()
-        output_folder_generated = new File(analysis_folder_path.getAbsolutePath() + File.separator + users_list.getSelectedItem())
+        output_folder_generated = new File(analysis_folder_path.getAbsolutePath() + File.separator)
         edited_yaml_parameters.general_parameters.processing_yaml_parameter_file = new File(output_folder_generated.getAbsolutePath() + File.separator + "processing_parameters.yml").toString()
         edited_yaml_parameters.global_variables.use_fast_reader = use_fast_reader.isSelected()
         edited_yaml_parameters.global_variables.resave_in_hdf5 = resave_in_hdf5.isSelected()
         edited_yaml_parameters.global_variables.use_fast_fusion = use_fast_fusion.isSelected()
         edited_yaml_parameters.global_variables.fusion_method = fusion_method.getText()
+        
+        // Write new file and save parameters content
+        println("Saving in this folder " + disp_output_path.getText())
         if(!output_folder_generated.exists()){
-            println("Saving in this folder" + disp_output_path.getText())
             output_folder_generated.mkdirs()
         }
+        
         def saved_yaml = new File(output_folder_generated.getAbsolutePath() + File.separator + "processing_parameters.yml")
         om.writeValue(saved_yaml, edited_yaml_parameters)
 
