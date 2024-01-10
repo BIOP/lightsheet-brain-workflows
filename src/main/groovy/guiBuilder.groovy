@@ -1,7 +1,9 @@
 /*
 TO DO:
-1) Rotation of the brain and resaving "ial" to "asr" (ie horizontal to coronal view)
+1) Rotation of the brain and resaving "ial" to "asr"
+ (ie horizontal to coronal view)
 2) Saving data in 3D stacks or 2D images (one folder per channel with all the slices in it) either after BigStitcher
+2bis) Output voxel size (x,y,z) for each brain (information needed for brainreg) 
 3) Include Atlas warped to data with BrainReg script (as a last step) -> first deliverable done on workstations (BOP or FLPL) in mid to end Jan 2024
 4) Have a parameters.yml for each brain to look for with Snakemake
 5) modify this script to launch it in a cmd line
