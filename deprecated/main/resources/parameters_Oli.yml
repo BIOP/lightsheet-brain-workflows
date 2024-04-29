@@ -1,0 +1,44 @@
+general_parameters:
+  user: Olivier_Burri
+  input_path: F:\Lightsheet Workflows\data\AB001\Anatomy\AB001.czi
+  output_dir: F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001
+  yaml_parameter_file: F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\AB001_configuration.yml
+  preprocessing: true
+  atlas_registration: false
+  save_2D: false
+  save_3D: true
+  orientation_acquisition: RAS
+  orientation_output: IPL
+  downsampling: 16
+bigstitcher:
+    reader: fast
+    fusion: fast
+    xml_file: 
+    channel_alignment_parameters:
+      pairwise_shifts_downsamples:
+        x: 4
+        y: 4
+        z: 2
+      filter_min_r: 0.7
+    tile_alignment_parameters:
+      channel_grouping: group
+      use_channel: 0
+      pairwise_shifts_downsamples:
+        x: 4
+        y: 4
+        z: 2
+      filter_min_r: 0.7
+    icp_refinement_parameters:
+      icp_refinement_type: Simple (all together)
+      downsampling: Downsampling 8/8/4
+      interest: Average Threshold
+      icp_max_error: Normal Adjustment (<5px)
+    fusion_parameters:
+      fusion_type: fast
+      preserve_original: preserve_original
+      produce: Each timepoint & channel
+      fused_image: Save as (compressed) TIFF stacks
+      filename_addition: filename_addition
+      fusion_method: "SMOOTH AVERAGE"
+    reorientation_parameters:
+      original_orientation: IPL
