@@ -17,6 +17,7 @@ resaver.createBigStitcherDataset()
 resaver.alignChannels() 
 resaver.stitchTiles() 
  
+
 // Reorientation 
 resaver.toASR( )
 
@@ -254,7 +255,9 @@ class StitchAndResave {
 		t['RAS'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]] 
 		//... and so on 
 	 
-	 
+	 	if( !settings.general_parameters.do_reorientation )
+	 		return
+	 	
 		// If the transformation exists, then use it 
 		if ( t.containsKey( originalOrientation ) ) { 
 			t[originalOrientation].each{ p -> 
@@ -357,11 +360,15 @@ class StitchAndResave {
 			extras = " -a " + fileNames.collect{ "\"$it\"" }.join(" ")
 		}
 		IJ.log( extras )
-
-
+		
+		// If the reorientation did not take place, use the one provided by the user
+		def orientation = "asr"
+		if( !settings.general_parameters.do_reorientation ) {
+			orientation = settings.general_parameters.orientation_acquisition.toLowerCase()
+		}
 		// Execute the docker command, these need to be added to the yml
 		//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
-		def processString = "docker run -t -v \"${fileNames[0].getParent()}\":\"/stitching\" ${settings.brainreg.docker_container_name} brainreg /stitching/${fileNames[0].getName()} stitching/registered -v $voxelSize $voxelSize $voxelSize --orientation asr$extras"
+		def processString = "docker run -t -v \"${fileNames[0].getParent()}\":\"/stitching\" ${settings.brainreg.docker_container_name} brainreg /stitching/${fileNames[0].getName()} stitching/registered -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
 		IJ.log( processString )
 		def task = processString.execute()
 		task.waitForProcessOutput(System.out, System.err)

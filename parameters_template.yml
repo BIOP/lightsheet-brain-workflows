@@ -3,7 +3,8 @@ general_parameters:
   atlas_registration: false
   save_2D: false
   save_3D: true
-  orientation_acquisition: IPL # Choose None if you do not want to reorient your sample
+  orientation_acquisition: IPL
+  do_reorientation: true # Choose false if you do not want to reorient your sample
   downsampling: 8
   # The following general parameters are automatically set
   input_path: 
