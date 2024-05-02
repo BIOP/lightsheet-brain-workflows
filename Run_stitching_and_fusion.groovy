@@ -11,19 +11,20 @@ import ij.IJ
 import java.time.Duration 
 		 
 def resaver = new StitchAndResave( yamlFile ) 
- 
-//resaver.createBigStitcherDataset() 
-//resaver.alignChannels() 
-//resaver.stitchTiles() 
+/* 
+resaver.createBigStitcherDataset() 
+
+resaver.alignChannels() 
+resaver.stitchTiles() 
  
 // Reorientation 
-//resaver.toASR( )
-
+resaver.toASR( )
+*/
 // Fusion 
-//resaver.fuseDataset( ) 
+resaver.fuseDataset( )
+
 resaver.runRegistration()
-return
- 
+
  
 class StitchAndResave { 
 	def settings 
@@ -243,7 +244,7 @@ class StitchAndResave {
 	 */ 
 	def toASR() { 
 		// Make sure that it is written in caps 
-		def originalOrientation = settings.general_parameters.orientation_output.toUpperCase() 
+		def originalOrientation = settings.general_parameters.orientation_acquisition.toUpperCase()
 		//def transformMap = new LinkedHashMap<Pair<String, String>, ArrayList<LinkedHashMap<String, String>>>() 
 		//transformMap.put 
 		// Build a map of transformations that we can orient the data with from ASR to... 
@@ -285,7 +286,7 @@ class StitchAndResave {
 	def fuseDataset() { 
 		addToLog( "Start data fusion", false )
 		// Create fused directory
-		def fusedDirectory = new File( settings.general_parameters.output_dir + "/" + settings.bigstitcher.fused_directory )
+		def fusedDirectory = new File( settings.general_parameters.output_dir + "/" + settings.bigstitcher.fusion_parameters.fuse_dir )
 		fusedDirectory.mkdirs()
 		
 		
@@ -303,8 +304,8 @@ class StitchAndResave {
                     "split_slices=false " + 
                     "split_channels=false " + 
                     "split_frames=false " + 
-                    "override_z_ratio=true " + //false 
-                    "z_ratio=10.0 " + //empty 
+                    "override_z_ratio=false " + //false 
+                    "z_ratio= " + //empty 
                     "use_interpolation=false " + 
                     "fusion_method=[" + settings.bigstitcher.fusion_parameters.fusion_method + "] ") 
  
@@ -334,12 +335,6 @@ class StitchAndResave {
         addToLog("Data fusion DONE", true) 
 	}
 	
-	def resaveDataset() {
-		// Resave as tiff series
-		// get all the files and resave as series
-		def fusedDirectory = new File( settings.general_parameters.output_dir + "/" + settings.bigstitcher.fused_directory )
-		
-	}
 	
 	def runRegistration() {
         addToLog( "Getting voxel size for dataset", false ) 
@@ -349,27 +344,27 @@ class StitchAndResave {
 		// Number of channels
 		def nC = xml.SequenceDescription.ViewSetups.Attributes.findAll{ it.@name == "channel" }.Channel.size()
 		
-		def fusedDirectory = new File( settings.general_parameters.output_dir + "/" + settings.bigstitcher.fused_directory )
-		def imageName = new File(settings.general_parameters.input_path).getName()
+		def fusedDirectory = new File( settings.general_parameters.output_dir + "/" + settings.bigstitcher.fusion_parameters.fuse_dir )
+		def imageName = new File( settings.general_parameters.input_path ).getName()
 		// Make a folder for the registration and place the tiff file sequence in it
 		// Get the filename
 		
 		def fileNames = (0..(nC-1)).collect{ new File( fusedDirectory, imageName + "_fused_tp_0_ch_${it}.tif") }
 		
+		def extras = ""
 		// Append extra channels
-		def extras = fileNames.collect{ "\"$it\""}.join(" ")
+		if( fileNames.size() > 1 ) {
+			extras = " -a " + fileNames.collect{ "\"$it\"" }.join(" ")
+		}
 		IJ.log( extras )
 
-		
-		
+
 		// Execute the docker command, these need to be added to the yml
 		//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
-		def processString = "docker run -t -v \"${fileNames[0].getParent()}\":\"/stitching\" biop-brainreg brainreg /stitching/${fileNames[0].getName()} stitching/registered -v $voxelSize $voxelSize $voxelSize --orientation asr -a $extras"
+		def processString = "docker run -t -v \"${fileNames[0].getParent()}\":\"/stitching\" ${settings.brainreg.docker_container_name} brainreg /stitching/${fileNames[0].getName()} stitching/registered -v $voxelSize $voxelSize $voxelSize --orientation asr$extras"
 		IJ.log( processString )
 		def task = processString.execute()
 		task.waitForProcessOutput(System.out, System.err)
-		// run process
-		// wait for process to finish
 		
 	}
  
