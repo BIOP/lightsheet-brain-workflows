@@ -11,7 +11,7 @@ import ij.IJ
 import java.time.Duration 
 		 
 def resaver = new StitchAndResave( yamlFile ) 
-/* 
+
 resaver.createBigStitcherDataset() 
 
 resaver.alignChannels() 
@@ -19,7 +19,7 @@ resaver.stitchTiles()
  
 // Reorientation 
 resaver.toASR( )
-*/
+
 // Fusion 
 resaver.fuseDataset( )
 
