@@ -1,0 +1,30 @@
+Building DAG of jobs...
+Full Traceback (most recent call last):
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\cli.py", line 1963, in args_to_api
+    dag_api.execute_workflow(
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\api.py", line 568, in execute_workflow
+    workflow.execute(
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\workflow.py", line 1055, in execute
+    self._build_dag()
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\workflow.py", line 1011, in _build_dag
+    async_run(self.dag.init())
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\common\__init__.py", line 88, in async_run
+    return asyncio.run(coroutine)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\asyncio\runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\asyncio\base_events.py", line 684, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\dag.py", line 168, in init
+    for job in map(self.rule2job, self.targetrules):
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\dag.py", line 1992, in rule2job
+    raise WorkflowError(
+snakemake_interface_common.exceptions.WorkflowError: Target rules may not contain wildcards. Please specify concrete files or a rule without wildcards at the command line, or have a rule without wildcards at the very top of your workflow (e.g. the typical "rule all" which just collects all results you want to generate in the end).
+
+WorkflowError:
+Target rules may not contain wildcards. Please specify concrete files or a rule without wildcards at the command line, or have a rule without wildcards at the very top of your workflow (e.g. the typical "rule all" which just collects all results you want to generate in the end).

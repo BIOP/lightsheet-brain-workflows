@@ -1,0 +1,82 @@
+Building DAG of jobs...
+Full Traceback (most recent call last):
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\jobs.py", line 142, in new
+    obj = self.cache[key]
+          ~~~~~~~~~~^^^^^
+KeyError: ('process_yml',)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\io.py", line 1023, in format_match
+    value = wildcards[name]
+            ~~~~~~~~~^^^^^^
+KeyError: 'brain'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\rules.py", line 761, in expand_input
+    incomplete = self._apply_wildcards(
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\rules.py", line 732, in _apply_wildcards
+    concrete = concretize(item_, wildcards, _is_callable)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\rules.py", line 751, in concretize_iofile
+    return f.apply_wildcards(wildcards)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\io.py", line 768, in apply_wildcards
+    apply_wildcards(f, wildcards),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\io.py", line 1028, in apply_wildcards
+    return WILDCARD_REGEX.sub(format_match, pattern)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\io.py", line 1026, in format_match
+    raise WildcardError(str(ex))
+snakemake.exceptions.WildcardError: 'brain'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\cli.py", line 1963, in args_to_api
+    dag_api.execute_workflow(
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\api.py", line 568, in execute_workflow
+    workflow.execute(
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\workflow.py", line 1055, in execute
+    self._build_dag()
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\workflow.py", line 1011, in _build_dag
+    async_run(self.dag.init())
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\common\__init__.py", line 88, in async_run
+    return asyncio.run(coroutine)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\asyncio\runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\asyncio\base_events.py", line 684, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\dag.py", line 168, in init
+    for job in map(self.rule2job, self.targetrules):
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\dag.py", line 1998, in rule2job
+    return self.new_job(targetrule)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\dag.py", line 1787, in new_job
+    job = self.job_factory.new(
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\jobs.py", line 144, in new
+    obj = Job(rule, dag, wildcards_dict, format_wildcards, targetfile)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\jobs.py", line 211, in __init__
+    ) = self.rule.expand_input(self.wildcards_dict, groupid=groupid)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\conda\conda-envs\snakemake\Lib\site-packages\snakemake\rules.py", line 773, in expand_input
+    raise WildcardError(
+snakemake.exceptions.WildcardError: Wildcards in input files cannot be determined from output files: (rule process_yml, line 7, F:\Lightsheet Workflows\lightsheet-brain-workflows\snakemake\Snakefile)
+'brain'
+
+WildcardError in rule process_yml in file F:\Lightsheet Workflows\lightsheet-brain-workflows\snakemake\Snakefile, line 7:
+Wildcards in input files cannot be determined from output files: (rule process_yml, line 7, F:\Lightsheet Workflows\lightsheet-brain-workflows\snakemake\Snakefile)
+'brain'
