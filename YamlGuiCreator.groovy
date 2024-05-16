@@ -13,6 +13,8 @@ import java.awt.event.WindowListener;
 import javax.swing.*;
 import javax.swing.GroupLayout.ParallelGroup
 import javax.swing.GroupLayout.SequentialGroup
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 import java.awt.FlowLayout;
 import javax.swing.BoxLayout
 import java.awt.event.ItemEvent;
@@ -41,11 +43,14 @@ public class Dialog extends JFrame {
 	}
 	
 	private File currentDir = new File("")
+	def yamlConfig
 	
 	/**
 	 * Generates the GUI
 	 **/
 	public void myDialog(yamlContent) {
+		yamlConfig = yamlContent
+		
 		// set general frame
 		this.setTitle("Select your custom configuration")
 	    this.setVisible(true);
@@ -108,7 +113,14 @@ public class Dialog extends JFrame {
 		
 		// create the buttons
 		JButton bnSave = new JButton("Save");
+		// add listener on Ok and Cancel button
+		bnSave.addActionListener(e->{
+    		saveYamlToFile(yamlConfig, "D:/Remy/User Projects/axel.bisi_LSENS/lightsheet-brain-workflows/test.yaml")
+		})
     	JButton bnCancel = new JButton("Cancel");
+    	bnCancel.addActionListener(e->{
+    		this.dispose()
+		})
 
 		// set the columns
 		SequentialGroup horizontalGroup = layout.createSequentialGroup()
@@ -167,7 +179,7 @@ public class Dialog extends JFrame {
 					def valueItem
 					def folderItem
 					// returns the GUI field corresponding to file/string/boolean
-			        (valueItem, folderItem) = selectRightField(key, value)
+			        (valueItem, folderItem) = selectRightField(it, key, value)
 			        
 			        // special case for folders because they need two fields (text field + button)
 			        if(folderItem != null){
@@ -203,11 +215,14 @@ public class Dialog extends JFrame {
 	/**
 	 * Choose the right category of field (boolean, String, File) according by guesing it from the value
 	 */
-	private selectRightField(label, value){
+	private selectRightField(entry, label, value){
 		// create a checkbox
 		if(value instanceof Boolean){
 			JCheckBox chk = new JCheckBox();
 			chk.setSelected(value);
+			chk.addActionListener(e -> {
+				entry.setValue(chk.isSelected())
+	        });
 			return [chk, null]
 		}
 		
@@ -242,23 +257,39 @@ public class Dialog extends JFrame {
 	            if (result == JFileChooser.APPROVE_OPTION && directoryChooser.getSelectedFile() != null){
 	                tfFolder.setText(directoryChooser.getSelectedFile().getAbsolutePath());
 	                currentDir = directoryChooser.getSelectedFile()
+	                entry.setValue(currentDir.getAbsolutePath())
 	            }
 	        });
 	        return [tfFolder, browseFolderButton]
 		}
 		
 		// create a simple text field
-		return [new JTextField(""+value), null]
+		def tfString = new JTextField(""+value)
+		tfString.getDocument().addDocumentListener(new DocumentListener() {
+		  public void changedUpdate(DocumentEvent e) {
+		  	setValue()
+		  }
+		  public void removeUpdate(DocumentEvent e) {
+		    setValue()
+		  }
+		  public void insertUpdate(DocumentEvent e) {
+		    setValue()		  
+		  }
+		  
+		  public void setValue(){
+		  	if(value instanceof Integer && tfString.getText() != null && !tfString.getText().isEmpty())
+		    	entry.setValue(Integer.parseInt(tfString.getText()))
+		    else if (value instanceof Double && tfString.getText() != null && !tfString.getText().isEmpty())
+		    	entry.setValue(Double.parseDouble(tfString.getText()))
+		    else
+		    	entry.setValue(tfString.getText())
+		  }
+		});
+		
+		return [tfString, null]
 	}
-} 
-
-def readYamlConfig(File yamlFile) {
-	Yaml parser = new Yaml()
-	def data = parser.load( yamlFile.text )
-	return data
-}
-
-def saveYamlToFile( def yamlConfig, def yamlPath ) {
+	
+	def saveYamlToFile( def yamlConfig, def yamlPath ) {
     final DumperOptions options = new DumperOptions()
     options.setDefaultFlowStyle( DumperOptions.FlowStyle.BLOCK )
     options.setPrettyFlow( true )
@@ -270,3 +301,12 @@ def saveYamlToFile( def yamlConfig, def yamlPath ) {
     yaml.dump( yamlConfig, writer )
     writer.close()
 }
+
+} 
+
+def readYamlConfig(File yamlFile) {
+	Yaml parser = new Yaml()
+	def data = parser.load( yamlFile.text )
+	return data
+}
+
