@@ -45,6 +45,7 @@ public class Dialog extends JFrame {
 	public boolean getEnterPressed(){return this.enterPressed}
 	public boolean getValidated(){return this.validated}
 	public String getUserId(){return this.userId}
+	private File currentDir = new File("")
 
 	public List<Map<String, String>> getSelectedList(){return this.selectionList}
 	
@@ -98,8 +99,9 @@ public class Dialog extends JFrame {
     private void tabGUICreation(tabContentMap, layout, horizontalGroups, verticalGroups, labelHGroup){
     	
 		if(tabContentMap != null){
-			
+			// create a new column for the values or getting the next one
 			ParallelGroup valueHGroup
+			ParallelGroup folderHGroup = null
 			def index = horizontalGroups.findIndexOf{it == labelHGroup}
 			if(index == horizontalGroups.size() - 1){
 				valueHGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -110,30 +112,87 @@ public class Dialog extends JFrame {
 			
 			tabContentMap.each{
 				def value = it.getValue()
+				def key = it.getKey()
+				
 				if(value instanceof Map<?,?>){
-					JLabel label  = new JLabel(it.getKey());
-					
+					// add the label to the current column
+					JLabel label  = new JLabel(key);
 					labelHGroup.addComponent(label)
 					
+					// create a new line with the label only
 					ParallelGroup VGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
 					VGroup.addComponent(label)
 					verticalGroups.add(VGroup)
 					
+					// add the new indented lines for the next group
 					tabGUICreation(value, layout, horizontalGroups, verticalGroups, valueHGroup)
 				}else{
-				
-			        JLabel label  = new JLabel(it.getKey());
-					JTextField tf = new JTextField(""+value);
-					
+					def valueItem
+					def folderItem
+			        (valueItem, folderItem) = selectRightField(key, value)
+			        
+			        if(folderItem != null){
+						index = horizontalGroups.findIndexOf{it == valueHGroup}
+						if(index == horizontalGroups.size() - 1){
+							folderHGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+							horizontalGroups.add(folderHGroup)
+						}else{
+							folderHGroup = horizontalGroups.get(index + 1)
+						}
+						folderHGroup.addComponent(folderItem)
+			        }
+			        
+					JLabel label = new JLabel(key)
 					labelHGroup.addComponent(label)
-					valueHGroup.addComponent(tf)
+					valueHGroup.addComponent(valueItem)
 					
 					ParallelGroup VGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-					VGroup.addComponent(label).addComponent(tf)
+					VGroup.addComponent(label).addComponent(valueItem)
+					if(folderItem != null) VGroup.addComponent(folderItem)
 					verticalGroups.add(VGroup)
 				}
 			}
 		}
+	}
+	
+	private selectRightField(label, value){
+		
+		if(value instanceof Boolean){
+			JCheckBox chk = new JCheckBox();
+			chk.setSelected(value);
+			return [chk, null]
+		}
+		
+		if(label.endsWith("file") || label.endsWith("path") || label.endsWith("dir")){
+			JTextField tfFolder = new JTextField(""+value);
+			tfFolder.setColumns(5);
+			
+	        def fileOption
+	        def title
+	        if(label.endsWith("dir")){
+	        	fileOption = JFileChooser.DIRECTORIES_ONLY
+	        	title = "Choose folder"
+	        }else{
+	        	fileOption = JFileChooser.FILES_ONLY
+	        	title = "Choose file"
+	        }
+	        JButton browseFolderButton = new JButton(title);
+	        browseFolderButton.addActionListener(e->{
+	            JFileChooser directoryChooser = new JFileChooser();
+	            directoryChooser.setFileSelectionMode(fileOption);
+	            if(currentDir.exists()) directoryChooser.setCurrentDirectory(currentDir);
+	            directoryChooser.setDialogTitle(title);
+	            def result = directoryChooser.showDialog(new JDialog(),"Select");
+
+	            if (result == JFileChooser.APPROVE_OPTION && directoryChooser.getSelectedFile() != null){
+	                tfFolder.setText(directoryChooser.getSelectedFile().getAbsolutePath());
+	                currentDir = directoryChooser.getSelectedFile()
+	            }
+	        });
+	        return [tfFolder, browseFolderButton]
+		}
+		
+		return [new JTextField(""+value), null]
 	}
 } 
 
