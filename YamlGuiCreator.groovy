@@ -19,6 +19,9 @@ import java.awt.FlowLayout;
 import javax.swing.BoxLayout
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JOptionPane; 
@@ -111,33 +114,103 @@ public class Dialog extends JFrame {
     	JPanel tabPanel = new JPanel();
 		def layout = new GroupLayout(tabPanel);
 		
-		// create the buttons
+		JTextArea textArea = new JTextArea();
+
+		JButton bnAddFolders = new JButton("Add folders");
+		bnAddFolders.addActionListener(e->{
+            JFileChooser directoryChooser = new JFileChooser();
+            directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            directoryChooser.setCurrentDirectory(currentDir);
+            directoryChooser.setMultiSelectionEnabled(true)
+            directoryChooser.setDialogTitle("Choose the CZI folders");
+            directoryChooser.showDialog(new JDialog(),"Select");
+
+            if (directoryChooser.getSelectedFiles() != null){
+            	def previousText = textArea.getText()
+                textArea.setText(previousText + directoryChooser.getSelectedFiles().join("\n") + "\n");
+                currentDir = directoryChooser.getSelectedFile()
+            }
+        });
+        
+		JButton bnClearFolders = new JButton("Clear folders");
+		bnClearFolders.addActionListener(e->{
+    		textArea.setText("");
+		})
+		
+		JLabel finalMessage = new JLabel("")
+		
+		JTextField tfAnalysisFolder = new JTextField("");
+		JButton bnAddAnalysisFolder = new JButton("Anaylsis folder");
+		bnAddAnalysisFolder.addActionListener(e->{
+            JFileChooser directoryChooser = new JFileChooser();
+            directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            directoryChooser.setCurrentDirectory(currentDir);
+            directoryChooser.setDialogTitle("Choose the analysis folder");
+            directoryChooser.showDialog(new JDialog(),"Select");
+
+            if (directoryChooser.getSelectedFile() != null){
+                tfAnalysisFolder.setText(directoryChooser.getSelectedFile().getAbsolutePath());
+                currentDir = directoryChooser.getSelectedFile()
+            }
+        });
+		
 		JButton bnSave = new JButton("Save");
 		// add listener on Ok and Cancel button
 		bnSave.addActionListener(e->{
-    		saveYamlToFile(yamlConfig, "D:/Remy/User Projects/axel.bisi_LSENS/lightsheet-brain-workflows/test.yaml")
+			def text = textArea.getText()
+			def message = ""
+			if(text.isEmpty() || tfAnalysisFolder.getText().isEmpty()){
+				message += "You have to select at least one CZI folder and the analysis folder !"
+			}else{
+				def cziFolders = text.split("\n")
+				message = saveYamlParameters(yamlConfig, tfAnalysisFolder.getText(), cziFolders)
+			}
+			finalMessage.setText("<html>"+message+"</html>")
 		})
-    	JButton bnCancel = new JButton("Cancel");
-    	bnCancel.addActionListener(e->{
-    		this.dispose()
-		})
+		
+		
+		GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = new Insets(5,5,5,5);
 
-		// set the columns
-		SequentialGroup horizontalGroup = layout.createSequentialGroup()
-											.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-											.addComponent(bnSave)
-											.addComponent(bnCancel))
-		// set the line
-		SequentialGroup verticalGroup = layout.createSequentialGroup()
-										.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-										.addComponent(bnSave))
-										.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-										.addComponent(bnCancel))
-		// add to the tab content
-    	layout.setHorizontalGroup(horizontalGroup)
-    	layout.setVerticalGroup(verticalGroup)
-    	tabPanel.setLayout(layout);
-    	
+        int settingsRow = 0;
+        tabPanel.setLayout(new GridBagLayout());
+		 
+		constraints.gridwidth = 5; 
+		constraints.gridx = 0;
+        constraints.gridy = settingsRow;
+        tabPanel.add(tfAnalysisFolder, constraints);
+        constraints.gridwidth = 1;
+         
+        constraints.gridx = 5;
+        constraints.gridy = settingsRow++;
+        tabPanel.add(bnAddAnalysisFolder, constraints);
+        
+		constraints.gridwidth = 5; 
+		constraints.gridheight = 5;
+        constraints.gridx = 0;
+        constraints.gridy = settingsRow;
+        tabPanel.add(textArea, constraints);
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        
+        constraints.gridx = 5;
+        constraints.gridy = settingsRow++;
+        tabPanel.add(bnAddFolders, constraints);
+        
+        constraints.gridx = 5;
+        constraints.gridy = settingsRow++;
+        tabPanel.add(bnClearFolders, constraints);
+        
+        constraints.gridx = 5;
+        constraints.gridy = settingsRow++;
+        tabPanel.add(bnSave, constraints);
+        
+        settingsRow++
+        constraints.gridx = 0;
+        constraints.gridy = ++settingsRow;
+        tabPanel.add(finalMessage, constraints);
+        
     	return tabPanel
     }
     
@@ -289,21 +362,83 @@ public class Dialog extends JFrame {
 		return [tfString, null]
 	}
 	
-	def saveYamlToFile( def yamlConfig, def yamlPath ) {
-    final DumperOptions options = new DumperOptions()
-    options.setDefaultFlowStyle( DumperOptions.FlowStyle.BLOCK )
-    options.setPrettyFlow( true )
-    def yaml = new Yaml( options )
-    
+	/**
+	 * Prepare the yaml files for the selected czi files
+	 *
+	 */
+	def saveYamlParameters(yamlConfig, analysisFolder, cziFolders){
+		def filesToAnalyse = []
+		def message = ""
+		
+		if(!(new File(analysisFolder)).exists()){
+			return "The analysis folder doesn't exists ! Please enter a valid one.<br>"
+		}
+		
+		def user = yamlConfig.general_parameters.user
 
-    def writer = new FileWriter( yamlPath )
-    println "saving to ${yamlPath.toString()}"
-    yaml.dump( yamlConfig, writer )
-    writer.close()
-}
+		// Create folder in analysis folder
+		def userAnalysisFolder = new File(analysisFolder, user)
+
+		// Simply prepare all the data
+		cziFolders.each{ path ->
+			def folder = new File(path)
+			if(folder.exists()){
+				// Copy the base YAML file to each subfolder and give it the name imageName_params.yml
+				folder.eachFileRecurse(FILES) {
+			    	if(it.name.endsWith('.czi')) {
+			    		filesToAnalyse.add(it)
+			    	}
+			    }
+			}else{
+				message += "The folder '"+folder.getName()+"' doesn't exists ! Cannot save the YAML file.<br>"
+			}
+		}
+		
+		filesToAnalyse.each{cziFile ->
+			
+			// Get the required information. Folder with the name of the dataset
+			def imageName = FilenameUtils.getBaseName(cziFile.getAbsolutePath())
+			def outputDirectory = new File(userAnalysisFolder, imageName)
+			outputDirectory.mkdirs()
+			
+			def localYamlConfigFile = new File(outputDirectory, "${imageName}_configuration.yml")
+			
+			// Prepare the configuration 
+			yamlConfig.general_parameters.input_path = cziFile.toString()
+			yamlConfig.general_parameters.output_dir = outputDirectory.toString()
+			yamlConfig.general_parameters.yaml_parameter_file = localYamlConfigFile.toString()
+		
+			// Define the xml already here
+			def bigStitcherXMLFile = new File(outputDirectory, "${imageName}.xml")
+			yamlConfig.bigstitcher.xml_file = bigStitcherXMLFile.toString()
+		
+			saveYamlToFile(yamlConfig, localYamlConfigFile)
+			message += "YAML file saved for '"+cziFile.getName()+"'<br>"
+		}
+		return message
+	}
+	
+	/**
+	 * saves a new yaml file
+	 */
+	def saveYamlToFile(def yamlConfig, def yamlPath) {
+	    final DumperOptions options = new DumperOptions()
+	    options.setDefaultFlowStyle( DumperOptions.FlowStyle.BLOCK )
+	    options.setPrettyFlow( true )
+	    def yaml = new Yaml( options )
+	    
+	
+	    def writer = new FileWriter( yamlPath )
+	    println "saving to ${yamlPath.toString()}"
+	    yaml.dump( yamlConfig, writer )
+	    writer.close()
+	}
 
 } 
 
+/**
+ * Reads the yaml file
+ */
 def readYamlConfig(File yamlFile) {
 	Yaml parser = new Yaml()
 	def data = parser.load( yamlFile.text )
