@@ -27,6 +27,7 @@ import java.awt.Toolkit;
 import javax.swing.JOptionPane; 
 import java.nio.file.Paths
 import java.nio.file.InvalidPathException
+import ij.IJ
 
 #@ File baseYaml
 
@@ -98,7 +99,7 @@ public class Dialog extends JFrame {
 			
 			// add the tab to the main GUI
 			tabPanel.setLayout(layout);
-			generalPanel.addTab(it.getKey(), null, tabPanel, ""+it.getKey());
+			generalPanel.addTab(it.getKey().split("_").collect{ it.capitalize() }.join(" "), null, tabPanel, ""+it.getKey());
 		}
 		// add the last tab to save the new yaml
 		generalPanel.addTab("Run", null, runPanelCreation(), "Run")
@@ -138,7 +139,7 @@ public class Dialog extends JFrame {
 		})
 		
 		JLabel finalMessage = new JLabel("")
-		
+	/**	
 		JTextField tfAnalysisFolder = new JTextField("");
 		JButton bnAddAnalysisFolder = new JButton("Anaylsis folder");
 		bnAddAnalysisFolder.addActionListener(e->{
@@ -153,17 +154,17 @@ public class Dialog extends JFrame {
                 currentDir = directoryChooser.getSelectedFile()
             }
         });
-		
+	*/
 		JButton bnSave = new JButton("Save");
 		// add listener on Ok and Cancel button
 		bnSave.addActionListener(e->{
 			def text = textArea.getText()
 			def message = ""
-			if(text.isEmpty() || tfAnalysisFolder.getText().isEmpty()){
+			if(text.isEmpty() ){
 				message += "You have to select at least one CZI folder and the analysis folder !"
 			}else{
 				def cziFolders = text.split("\n")
-				message = saveYamlParameters(yamlConfig, tfAnalysisFolder.getText(), cziFolders)
+				message = saveYamlParameters(yamlConfig, cziFolders)
 			}
 			finalMessage.setText("<html>"+message+"</html>")
 		})
@@ -179,12 +180,12 @@ public class Dialog extends JFrame {
 		constraints.gridwidth = 5; 
 		constraints.gridx = 0;
         constraints.gridy = settingsRow;
-        tabPanel.add(tfAnalysisFolder, constraints);
+        //tabPanel.add(tfAnalysisFolder, constraints);
         constraints.gridwidth = 1;
          
         constraints.gridx = 5;
         constraints.gridy = settingsRow++;
-        tabPanel.add(bnAddAnalysisFolder, constraints);
+        //tabPanel.add(bnAddAnalysisFolder, constraints);
         
 		constraints.gridwidth = 5; 
 		constraints.gridheight = 5;
@@ -233,7 +234,7 @@ public class Dialog extends JFrame {
 			
 			tabContentMap.each{
 				def value = it.getValue()
-				def key = it.getKey()
+				def key = it.getKey().split("_").collect{ it.capitalize() }.join(" ")
 				
 				// if the cuurent value is actually another Map of parameters, recusively call the method
 				if(value instanceof Map<?,?>){
@@ -300,7 +301,7 @@ public class Dialog extends JFrame {
 		}
 		
 		// create a text field and a button to search for a file
-		if(label.endsWith("file") || label.endsWith("path") || label.endsWith("dir")){
+		if(label.toLowerCase().endsWith("file") || label.toLowerCase().endsWith("path") || label.toLowerCase().endsWith("dir")){
 			JTextField tfFolder = new JTextField(""+value);
 			tfFolder.setColumns(5);
 			
@@ -308,7 +309,7 @@ public class Dialog extends JFrame {
 	        def title
 	        
 	        // select the option to restrict to files/folders only
-	        if(label.endsWith("dir")){
+	        if(label.toLowerCase().endsWith("dir")){
 	        	fileOption = JFileChooser.DIRECTORIES_ONLY
 	        	title = "Choose folder"
 	        }else{
@@ -366,15 +367,18 @@ public class Dialog extends JFrame {
 	 * Prepare the yaml files for the selected czi files
 	 *
 	 */
-	def saveYamlParameters(yamlConfig, analysisFolder, cziFolders){
+	def saveYamlParameters(yamlConfig, cziFolders){
 		def filesToAnalyse = []
 		def message = ""
+		
+		def user = yamlConfig.general.user
+		def analysisFolder = yamlConfig.general.save_dir
 		
 		if(!(new File(analysisFolder)).exists()){
 			return "The analysis folder doesn't exists ! Please enter a valid one.<br>"
 		}
 		
-		def user = yamlConfig.general_parameters.user
+
 
 		// Create folder in analysis folder
 		def userAnalysisFolder = new File(analysisFolder, user)
@@ -404,9 +408,8 @@ public class Dialog extends JFrame {
 			def localYamlConfigFile = new File(outputDirectory, "${imageName}_configuration.yml")
 			
 			// Prepare the configuration 
-			yamlConfig.general_parameters.input_path = cziFile.toString()
-			yamlConfig.general_parameters.output_dir = outputDirectory.toString()
-			yamlConfig.general_parameters.yaml_parameter_file = localYamlConfigFile.toString()
+			yamlConfig.general.input_file = cziFile.toString()
+			yamlConfig.general.output_dir = outputDirectory.toString()
 		
 			// Define the xml already here
 			def bigStitcherXMLFile = new File(outputDirectory, "${imageName}.xml")
