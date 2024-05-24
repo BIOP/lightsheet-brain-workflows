@@ -46,7 +46,8 @@ public class Dialog extends JFrame {
 		myDialog(yamlContent)
 	}
 	
-	private File currentDir = new File("")
+	String DEFAULT_PATH_KEY = "scriptDefaultDir"
+	private File currentDir = IJ.getProperty(DEFAULT_PATH_KEY) == null ? new File("") : ((File)IJ.getProperty(DEFAULT_PATH_KEY))
 	def yamlConfig
 	
 	/**
@@ -130,6 +131,7 @@ public class Dialog extends JFrame {
             	def previousText = textArea.getText()
                 textArea.setText(previousText + directoryChooser.getSelectedFiles().join("\n") + "\n");
                 currentDir = directoryChooser.getSelectedFile()
+                IJ.setProperty(DEFAULT_PATH_KEY, currentDir)
             }
         });
         
@@ -139,22 +141,6 @@ public class Dialog extends JFrame {
 		})
 		
 		JLabel finalMessage = new JLabel("")
-	/**	
-		JTextField tfAnalysisFolder = new JTextField("");
-		JButton bnAddAnalysisFolder = new JButton("Anaylsis folder");
-		bnAddAnalysisFolder.addActionListener(e->{
-            JFileChooser directoryChooser = new JFileChooser();
-            directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            directoryChooser.setCurrentDirectory(currentDir);
-            directoryChooser.setDialogTitle("Choose the analysis folder");
-            directoryChooser.showDialog(new JDialog(),"Select");
-
-            if (directoryChooser.getSelectedFile() != null){
-                tfAnalysisFolder.setText(directoryChooser.getSelectedFile().getAbsolutePath());
-                currentDir = directoryChooser.getSelectedFile()
-            }
-        });
-	*/
 		JButton bnSave = new JButton("Save");
 		// add listener on Ok and Cancel button
 		bnSave.addActionListener(e->{
@@ -176,17 +162,7 @@ public class Dialog extends JFrame {
 
         int settingsRow = 0;
         tabPanel.setLayout(new GridBagLayout());
-		 
-		constraints.gridwidth = 5; 
-		constraints.gridx = 0;
-        constraints.gridy = settingsRow;
-        //tabPanel.add(tfAnalysisFolder, constraints);
-        constraints.gridwidth = 1;
-         
-        constraints.gridx = 5;
-        constraints.gridy = settingsRow++;
-        //tabPanel.add(bnAddAnalysisFolder, constraints);
-        
+		         
 		constraints.gridwidth = 5; 
 		constraints.gridheight = 5;
         constraints.gridx = 0;
@@ -328,13 +304,14 @@ public class Dialog extends JFrame {
 	        browseFolderButton.addActionListener(e->{
 	            JFileChooser directoryChooser = new JFileChooser();
 	            directoryChooser.setFileSelectionMode(fileOption);
-	            if(currentDir.exists()) directoryChooser.setCurrentDirectory(currentDir);
+	            directoryChooser.setCurrentDirectory(currentDir);
 	            directoryChooser.setDialogTitle(title);
 	            def result = directoryChooser.showDialog(new JDialog(),"Select");
 
 	            if (result == JFileChooser.APPROVE_OPTION && directoryChooser.getSelectedFile() != null){
 	                tfFolder.setText(directoryChooser.getSelectedFile().getAbsolutePath());
 	                currentDir = directoryChooser.getSelectedFile()
+	                IJ.setProperty(DEFAULT_PATH_KEY, currentDir)
 	                entry.setValue(currentDir.getAbsolutePath())
 	            }
 	        });
@@ -381,9 +358,7 @@ public class Dialog extends JFrame {
 		if(!(new File(analysisFolder)).exists()){
 			return "The analysis folder doesn't exists ! Please enter a valid one.<br>"
 		}
-		
-
-
+		
 		// Create folder in analysis folder
 		def userAnalysisFolder = new File(analysisFolder, user)
 
