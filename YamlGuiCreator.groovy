@@ -226,7 +226,7 @@ public class Dialog extends JFrame {
 			ParallelGroup folderHGroup = null // this group is for a potential second column which contain the buttons to choose files
 			def index = horizontalGroups.findIndexOf{it == labelHGroup}
 			if(index == horizontalGroups.size() - 1){
-				valueHGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				valueHGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING)//TRAILING
 				horizontalGroups.add(valueHGroup)
 			}else{
 				valueHGroup = horizontalGroups.get(index + 1)
@@ -240,11 +240,12 @@ public class Dialog extends JFrame {
 				if(value instanceof Map<?,?>){
 					// add the label to the current column
 					JLabel label  = new JLabel(key);
-					labelHGroup.addComponent(label)
+					//JSeparator separator = new JSeparator()
+					labelHGroup/*.addComponent(separator)*/.addComponent(label)
 					
 					// create a new line with the label only
-					ParallelGroup VGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-					VGroup.addComponent(label)
+					SequentialGroup VGroup = layout.createSequentialGroup()//createParallelGroup(GroupLayout.Alignment.BASELINE)
+					VGroup/*.addComponent(separator)*/.addComponent(label)
 					verticalGroups.add(VGroup)
 					
 					// add the new indented lines for the next group
@@ -290,6 +291,9 @@ public class Dialog extends JFrame {
 	 * Choose the right category of field (boolean, String, File) according by guesing it from the value
 	 */
 	private selectRightField(entry, label, value){
+		if(value == null)
+			value = ""
+		
 		// create a checkbox
 		if(value instanceof Boolean){
 			JCheckBox chk = new JCheckBox();
