@@ -21,10 +21,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.FlowLayout
 import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JOptionPane; 
+import javax.swing.JScrollPane
 import java.nio.file.Paths
 import java.nio.file.InvalidPathException
 import ij.IJ
@@ -47,6 +49,10 @@ public class Dialog extends JFrame {
 	}
 	
 	String DEFAULT_PATH_KEY = "scriptDefaultDir"
+	int COLUMN = 0
+	int ROW = 1
+	int WIDTH = 2
+	int rowCounter = 0
 	private File currentDir = IJ.getProperty(DEFAULT_PATH_KEY) == null ? new File("") : ((File)IJ.getProperty(DEFAULT_PATH_KEY))
 	def yamlConfig
 	
@@ -60,7 +66,7 @@ public class Dialog extends JFrame {
 		this.setTitle("Select your custom configuration")
 	    this.setVisible(true);
 	    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	    //this.setPreferredSize(new Dimension(400, 250));
+	    this.setPreferredSize(new Dimension(630, 700));
 	    
 	    // get the screen size
 	    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -68,42 +74,58 @@ public class Dialog extends JFrame {
         double height = screenSize.getHeight();
         
         // set location in the middle of the screen
-	    this.setLocation((int)((width - 400)/2), (int)((height - 700)/2));
-		
+	    this.setLocation((int)((width - 630)/2), (int)((height - 700)/2));
 		JTabbedPane generalPanel = new JTabbedPane();
-		
+        
 		yamlContent.each{
 			// create the tab
 			JPanel tabPanel = new JPanel();
-			def layout = new GroupLayout(tabPanel);
-			layout.setAutoCreateGaps(true);
-        	layout.setAutoCreateContainerGaps(true);
-			
+			tabPanel.setLayout(new GridBagLayout());
+
 			// initialize the columns/lines
-			ParallelGroup initialHGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-			List<ParallelGroup> horizontalGroups = new ArrayList<>()
-			List<ParallelGroup> verticalGroups = new ArrayList<>()
-			horizontalGroups.add(initialHGroup)
+			List<Integer> columnList = new ArrayList()
+			columnList.add(0)
+			boolean separtorToAdd = true
 			
 			// create the content of the current tab
-			tabGUICreation(it.getValue(), layout, horizontalGroups, verticalGroups, initialHGroup)
+			Map<JComponent, Integer[]> components = tabGUICreation(it.getValue(), layout, columnList, columnList.get(0), separtorToAdd)
 			
-			// set the columns
-			SequentialGroup horizontalGroup = layout.createSequentialGroup()
-			horizontalGroups.each{gr -> horizontalGroup.addGroup(gr)}
-			layout.setHorizontalGroup(horizontalGroup)
+			// define the GUI tab
+			GridBagConstraints constraints = new GridBagConstraints();
+		    constraints.fill = GridBagConstraints.BOTH;
+		    constraints.insets = new Insets(5,5,5,5);
+
+			components.each{componentItem ->
+				JComponent component = componentItem.getKey()
+				Integer[] constraintsArray = componentItem.getValue()
+				constraints.gridwidth = constraintsArray[WIDTH]; 
+		        constraints.gridx = constraintsArray[COLUMN];
+		        constraints.gridy = constraintsArray[ROW];
+		        tabPanel.add(component, constraints);  	
+			}
+			 constraints.gridwidth = 1;
 			
-			// set the lines
-			SequentialGroup verticalGroup = layout.createSequentialGroup()
-			verticalGroups.each{gr -> verticalGroup.addGroup(gr)}
-			layout.setVerticalGroup(verticalGroup)
+			// format correctly the panel
+			JPanel nicePanel = new JPanel();
+			nicePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+			nicePanel.add(tabPanel)
+			
+			// add a scroll bar if necessary
+			JScrollPane sp = new JScrollPane(nicePanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			
 			// add the tab to the main GUI
-			tabPanel.setLayout(layout);
-			generalPanel.addTab(it.getKey().split("_").collect{ it.capitalize() }.join(" "), null, tabPanel, ""+it.getKey());
+			generalPanel.addTab(it.getKey().split("_").collect{ it.capitalize() }.join(" "), null, sp, ""+it.getKey());
 		}
+		
+		JPanel nicePanel = new JPanel();
+		nicePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		nicePanel.add(runPanelCreation())
+			
+		// add a scroll bar if necessary
+		JScrollPane sp = new JScrollPane(nicePanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
 		// add the last tab to save the new yaml
-		generalPanel.addTab("Run", null, runPanelCreation(), "Run")
+		generalPanel.addTab("Run", null, sp, "Run")
 		
         this.setContentPane(generalPanel);
         this.pack();
@@ -117,6 +139,7 @@ public class Dialog extends JFrame {
 		def layout = new GroupLayout(tabPanel);
 		
 		JTextArea textArea = new JTextArea();
+		textArea.setPreferredSize(new Dimension(300, 20));
 
 		JButton bnAddFolders = new JButton("Add folders");
 		bnAddFolders.addActionListener(e->{
@@ -194,72 +217,96 @@ public class Dialog extends JFrame {
     /**
      * Create the tab content (item and field creation, listeners, columns & line assignment)
      */
-    private void tabGUICreation(tabContentMap, layout, horizontalGroups, verticalGroups, labelHGroup){
+    private Map<JComponent, Integer[]> tabGUICreation(tabContentMap, layout, columnList, labelCIndex, separtorToAdd){
     	
+    	Map<JComponent, Integer[]> components = new LinkedHashMap<>()
+		
 		if(tabContentMap != null){
 			// create a new column for the values or getting the next one
-			ParallelGroup valueHGroup
-			ParallelGroup folderHGroup = null // this group is for a potential second column which contain the buttons to choose files
-			def index = horizontalGroups.findIndexOf{it == labelHGroup}
-			if(index == horizontalGroups.size() - 1){
-				valueHGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING)//TRAILING
-				horizontalGroups.add(valueHGroup)
+			int valueCIndex
+			int folderCIndex = -1 // this group is for a potential second column which contain the buttons to choose files
+			def index = columnList.findIndexOf{it == labelCIndex}
+			if(index == columnList.size() - 1){
+				valueCIndex = labelCIndex + 1
+				columnList.add(valueCIndex)
 			}else{
-				valueHGroup = horizontalGroups.get(index + 1)
+				valueCIndex = columnList.get(index + 1)
 			}
 			
 			tabContentMap.each{
 				def value = it.getValue()
 				def key = it.getKey().split("_").collect{ it.capitalize() }.join(" ")
 				
-				// if the cuurent value is actually another Map of parameters, recusively call the method
+				// if the curent value is actually another Map of parameters, recusively call the method
 				if(value instanceof Map<?,?>){
+					
+					// add a separator to each main category
+					if(separtorToAdd){
+						JSeparator separator = new JSeparator()
+						Integer[] constraintsSeparator = new Integer[4]
+						constraintsSeparator[COLUMN] = labelCIndex
+						constraintsSeparator[ROW] = rowCounter++
+						constraintsSeparator[WIDTH] = 10
+						components.put(separator, constraintsSeparator)
+					}
+					
 					// add the label to the current column
 					JLabel label  = new JLabel(key);
-					//JSeparator separator = new JSeparator()
-					labelHGroup/*.addComponent(separator)*/.addComponent(label)
-					
-					// create a new line with the label only
-					SequentialGroup VGroup = layout.createSequentialGroup()//createParallelGroup(GroupLayout.Alignment.BASELINE)
-					VGroup/*.addComponent(separator)*/.addComponent(label)
-					verticalGroups.add(VGroup)
-					
+					Integer[] constraints = new Integer[4]
+					constraints[COLUMN] = labelCIndex
+					constraints[ROW] = rowCounter
+					constraints[WIDTH] = 1
+					components.put(label, constraints)
+							
 					// add the new indented lines for the next group
-					tabGUICreation(value, layout, horizontalGroups, verticalGroups, valueHGroup)
+					components.putAll(tabGUICreation(value, layout, columnList, valueCIndex, false))
 				}else{
 					def valueItem
 					def folderItem
 					// returns the GUI field corresponding to file/string/boolean
-			        (valueItem, folderItem) = selectRightField(it, key, value)
+					(valueItem, folderItem) = selectRightField(it, key, value)
 			        
 			        // special case for folders because they need two fields (text field + button)
 			        if(folderItem != null){
 			        	// get the next column if exists. Otherwise, create it.
-						index = horizontalGroups.findIndexOf{it == valueHGroup}
-						if(index == horizontalGroups.size() - 1){
-							folderHGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-							horizontalGroups.add(folderHGroup)
+						index = columnList.findIndexOf{it == valueCIndex}
+						if(index == columnList.size() - 1){
+							folderCIndex = valueCIndex + 1
+							columnList.add(folderCIndex)
 						}else{
-							folderHGroup = horizontalGroups.get(index + 1)
-						}
-						
-						// add the button to the next column
-						folderHGroup.addComponent(folderItem)
+							folderCIndex = columnList.get(index + 1)
+						}
 			        }
 			        
 			        // add fields to the columns
 					JLabel label = new JLabel(key)
-					labelHGroup.addComponent(label)
-					valueHGroup.addComponent(valueItem)
+					label.setHorizontalAlignment(SwingConstants.RIGHT);
+					Integer[] constraints = new Integer[4]
+					constraints[COLUMN] = labelCIndex
+					constraints[ROW] = rowCounter
+					constraints[WIDTH] = 1
+					components.put(label, constraints)
 					
-					// create a new line in the GUI
-					ParallelGroup VGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-					VGroup.addComponent(label).addComponent(valueItem)
-					if(folderItem != null) VGroup.addComponent(folderItem)
-					verticalGroups.add(VGroup)
+					Integer[] constraintsValue = new Integer[4]
+					constraintsValue[COLUMN] = valueCIndex
+					constraintsValue[ROW] = rowCounter
+					constraintsValue[WIDTH] = 1
+					components.put(valueItem, constraintsValue)
+					
+					if(folderItem != null){
+						Integer[] constraintsFolder = new Integer[4]
+						constraintsFolder[COLUMN] = folderCIndex
+						constraintsFolder[ROW] = rowCounter++
+						constraintsFolder[WIDTH] = 1
+						components.put(folderItem, constraintsFolder)
+					}else{
+						rowCounter++
+					}
 				}
 			}
 		}
+		
+		return components
 	}
 	
 	
