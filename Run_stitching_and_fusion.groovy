@@ -18,13 +18,13 @@ resaver.alignChannels()
 resaver.stitchTiles() 
  
 
-// Reorientation 
+//Reorientation 
 resaver.toASR( )
 
 // Fusion 
 resaver.fuseDataset( )
 
-resaver.runRegistration()
+resaver.runRegistration2()
 
  
 class StitchAndResave { 
@@ -50,7 +50,7 @@ class StitchAndResave {
             addToLog( "INFO: Start Fast reader", false ) 
             // addToLog( "Loading/Resaving time = ") 
             // Import CZI file and resave it in xml format 
-            IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general_parameters.input_path + "] output_folder=[" + settings.general_parameters.output_dir + "]") 
+            IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general.input_file + "] output_folder=[" + settings.general.output_dir + "]") 
             // Import dataset into bigsticher 
  
             addToLog("INFO: Fast reader DONE", true ) 
@@ -64,14 +64,14 @@ class StitchAndResave {
 	                "select=define " + 
 	                "define_dataset=[Automatic Loader (Bioformats based)] " + 
 	                "project_filename=[" + settings.bigstitcher.xml_file + "] " + 
-	                "path=[" + settings.general_parameters.input_path + "] " + 
+	                "path=[" + settings.general.input_file + "] " + 
 	                "exclude=10 " + 
 	                "bioformats_series_are?=Tiles " + 
 	                "bioformats_channels_are?=Channels " + 
 	                "move_tiles_to_grid_(per_angle)?=[Do not move Tiles to Grid (use Metadata if available)] " + 
 	                "how_to_load_images=[Re-save as multiresolution HDF5] " + 
 	                "load_raw_data_virtually " + 
-	                "dataset_save_path=[" + settings.general_parameters.output_dir + "] " + 
+	                "dataset_save_path=[" + settings.general.output_dir + "] " + 
 	                //"subsampling_factors=[" + resaving_subsampling_factors + "] " + 
 	                //"hdf5_chunk_sizes=[" + resaving_hdf5_chunk_size + "] " + 
 	                "timepoints_per_partition=1 setups_per_partition=0 use_deflate_compression") 
@@ -118,9 +118,9 @@ class StitchAndResave {
                 "how_to_treat_illuminations=group " + 
                 "how_to_treat_angles=[treat individually] " + 
                 "how_to_treat_tiles=[treat individually] " + 
-                "downsample_in_x=" + settings.bigstitcher.channel_alignment_parameters.pairwise_shifts_downsamples.x + " " + 
-                "downsample_in_y=" + settings.bigstitcher.channel_alignment_parameters.pairwise_shifts_downsamples.y + " " + 
-                "downsample_in_z=" + settings.bigstitcher.channel_alignment_parameters.pairwise_shifts_downsamples.z + " " + 
+                "downsample_in_x=" + settings.bigstitcher.channel_alignment.pairwise_shifts_downsamples.x + " " + 
+                "downsample_in_y=" + settings.bigstitcher.channel_alignment.pairwise_shifts_downsamples.y + " " + 
+                "downsample_in_z=" + settings.bigstitcher.channel_alignment.pairwise_shifts_downsamples.z + " " + 
                 "channels=[use Channel 0] " 
         ) 
         //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " + 
@@ -129,7 +129,7 @@ class StitchAndResave {
          
         IJ.run("Filter pairwise shifts ...", "select=[" + settings.bigstitcher.xml_file + "] " + 
                 "filter_by_link_quality " + 
-                "min_r=" + settings.bigstitcher.channel_alignment_parameters.filter_min_r + " " + 
+                "min_r=" + settings.bigstitcher.channel_alignment.filter_min_r + " " + 
                 "max_r=1") 
  
  
@@ -175,13 +175,13 @@ class StitchAndResave {
 			                     "how_to_treat_angles=[treat individually] " + 
 			                     "how_to_treat_tiles=compare " 
                  
-		if( settings.bigstitcher.tile_alignment_parameters.use_channel != null ) { 
-			channelAlignString += "channels=[use Channel " + settings.bigstitcher.tile_alignment_parameters.use_channel + "] " 
+		if( settings.bigstitcher.tile_alignment.use_channel != null ) { 
+			channelAlignString += "channels=[use Channel " + settings.bigstitcher.tile_alignment.use_channel + "] " 
 		} 
 		 
-        channelAlignString += "downsample_in_x=" + settings.bigstitcher.tile_alignment_parameters.pairwise_shifts_downsamples.x + " " + 
-			                  "downsample_in_y=" + settings.bigstitcher.tile_alignment_parameters.pairwise_shifts_downsamples.y + " " + 
-			                  "downsample_in_z=" + settings.bigstitcher.tile_alignment_parameters.pairwise_shifts_downsamples.z 
+        channelAlignString += "downsample_in_x=" + settings.bigstitcher.tile_alignment.pairwise_shifts_downsamples.x + " " + 
+			                  "downsample_in_y=" + settings.bigstitcher.tile_alignment.pairwise_shifts_downsamples.y + " " + 
+			                  "downsample_in_z=" + settings.bigstitcher.tile_alignment.pairwise_shifts_downsamples.z 
 			                     
                  
         IJ.run("Calculate pairwise shifts ...", channelAlignString ) 
@@ -190,7 +190,7 @@ class StitchAndResave {
  
         IJ.run("Filter pairwise shifts ...", "select=[" + settings.bigstitcher.xml_file + "] " + 
                 "filter_by_link_quality " + 
-                "min_r=" + settings.bigstitcher.tile_alignment_parameters.filter_min_r + " " + 
+                "min_r=" + settings.bigstitcher.tile_alignment.filter_min_r + " " + 
                 "max_r=1") 
  
         // Perform global optimization and apply shifts 
@@ -230,11 +230,11 @@ class StitchAndResave {
                 "process_illumination=[All illuminations] " + 
                 "process_tile=[All tiles] " + 
                 "process_timepoint=[All Timepoints] " + 
-                "icp_refinement_type=[" + settings.bigstitcher.icp_refinement_parameters.icp_refinement_type + "] " + 
+                "icp_refinement_type=[" + settings.bigstitcher.icp_refinement.icp_refinement_type + "] " + 
                 //This was set in the macro recorder but not in LSENS code so I removed it -> "global_optimization_strategy=[Two-Round: Handle unconnected tiles, remove wrong links RELAXED (5.0x / 7.0px)] " + 
-                "downsampling=[" +settings.bigstitcher.icp_refinement_parameters.downsampling + "] " + 
-                "interest=[" + settings.bigstitcher.icp_refinement_parameters.interest + "] " + 
-                "icp_max_error=[" + settings.bigstitcher.icp_refinement_parameters.icp_max_error + "]") 
+                "downsampling=[" +settings.bigstitcher.icp_refinement.downsampling + "] " + 
+                "interest=[" + settings.bigstitcher.icp_refinement.interest + "] " + 
+                "icp_max_error=[" + settings.bigstitcher.icp_refinement.icp_max_error + "]") 
  
     	addToLog("ICP refinement DONE", true ) 
     	 
@@ -245,17 +245,26 @@ class StitchAndResave {
 	 */ 
 	def toASR() { 
 		// Make sure that it is written in caps 
-		def originalOrientation = settings.general_parameters.orientation_acquisition.toUpperCase()
-		//def transformMap = new LinkedHashMap<Pair<String, String>, ArrayList<LinkedHashMap<String, String>>>() 
-		//transformMap.put 
-		// Build a map of transformations that we can orient the data with from ASR to... 
-		//transformMap.put( [ASR:'IPL'] as Pair, [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90]] ) 
+		def originalOrientation = settings.bigstitcher.reorientation.raw_orientation.toUpperCase()
+		
 		def t = [:] 
 		t['IPL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90]] 
 		t['RAS'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]] 
+		t['SAL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:90]]
+		t['PSL'] = [[axis:"y-axis", angle:180]]
+		t['PIR'] = [[axis:"x-axis", angle:180]]
+		t['LAI'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]]
+		t['IAR'] = [[axis:"x-axis", angle:90]]
+		t['AIL'] = [[axis:"z-axis", angle:180]]
+		t['ASR'] = []
+		t['RPI'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:-90]]
+		t['IPL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90]]
+		t['LPS'] = [[axis:"y-axis", angle:90],  [axis:"x-axis", angle:-90]]
+		t['SPR'] = [[axis:"x-axis", angle:-90]]
+		
 		//... and so on 
 	 
-	 	if( !settings.general_parameters.do_reorientation )
+	 	if( !settings.bigstitcher.reorientation.reorient_to_asr )
 	 		return
 	 	
 		// If the transformation exists, then use it 
@@ -289,11 +298,11 @@ class StitchAndResave {
 	def fuseDataset() { 
 		addToLog( "Start data fusion", false )
 		// Create fused directory
-		def fusedDirectory = new File( settings.general_parameters.output_dir + "/" + settings.bigstitcher.fusion_parameters.fuse_dir )
+		def fusedDirectory = new File( settings.general.output_dir + "/" + settings.bigstitcher.fusion.fuse_dir )
 		fusedDirectory.mkdirs()
 		
 		
-		if( settings.bigstitcher.fusion_parameters.fusion_type == "fast" ) { 
+		if( settings.bigstitcher.fusion.fusion_type == "fast" ) { 
  
 			addToLog( "Fast data fusion", false ) 
             IJ.run("Fuse a BigStitcher dataset to OME-Tiff", 
@@ -310,7 +319,7 @@ class StitchAndResave {
                     "override_z_ratio=false " + //false 
                     "z_ratio= " + //empty 
                     "use_interpolation=false " + 
-                    "fusion_method=[" + settings.bigstitcher.fusion_parameters.fusion_method + "] ") 
+                    "fusion_method=[" + settings.bigstitcher.fusion.fusion_method + "] ") 
  
         } else { 
  
@@ -323,32 +332,31 @@ class StitchAndResave {
                     "process_tile=[All tiles] " + 
                     "process_timepoint=[All Timepoints] " + 
                     "bounding_box=[Currently Selected Views] " + 
-                    "downsampling=" + settings.general_parameters.downsampling + " " + 
+                    "downsampling=" + settings.bigstitcher.fusion.downsampling + " " + 
                     "pixel_type=[16-bit unsigned integer] " + 
                     "interpolation=[Linear Interpolation] " + 
                     "image=[Precompute Image] " + 
                     "interest_points_for_non_rigid=[-= Disable Non-Rigid =-] " + 
                     "blend " + 
-                    settings.bigstitcher.fusion_parameters.preserve_original + " " + 
-                    "produce=[" + settings.bigstitcher.fusion_parameters.produce + "] " + 
-                    "fused_image=[" + settings.bigstitcher.fusion_parameters.fused_image + "] " + 
+                    settings.bigstitcher.fusion.preserve_original + " " + 
+                    "produce=[" + settings.bigstitcher.fusion.produce + "] " + 
+                    "fused_image=[" + settings.bigstitcher.fusion.fused_image + "] " + 
                     "output_file_directory=[" + fusedDirectory + "] " + 
-                    "filename_addition=[" + new File(settings.general_parameters.input_path).getName() + "]") 	 
+                    "filename_addition=[" + new File(settings.general.input_file).getName() + "]") 	 
         }
         addToLog("Data fusion DONE", true) 
 	}
 	
-	
-	def runRegistration() {
-        addToLog( "Getting voxel size for dataset", false ) 
+	def runRegistration2() {
+		addToLog( "Getting voxel size for dataset", false ) 
 		def xml = readXML( settings.bigstitcher.xml_file )
-		def voxelSize = Double.parseDouble( xml.SequenceDescription.ViewSetups.ViewSetup[0].voxelSize.size.text().split(" ").min()) * settings.general_parameters.downsampling
+		def voxelSize = Double.parseDouble( xml.SequenceDescription.ViewSetups.ViewSetup[0].voxelSize.size.text().split(" ").min()) * settings.bigstitcher.fusion.downsampling
 		
 		// Number of channels
 		def nC = xml.SequenceDescription.ViewSetups.Attributes.findAll{ it.@name == "channel" }.Channel.size()
 		
-		def fusedDirectory = new File( settings.general_parameters.output_dir + "/" + settings.bigstitcher.fusion_parameters.fuse_dir )
-		def imageName = new File( settings.general_parameters.input_path ).getName()
+		def fusedDirectory = new File( settings.general.output_dir + "/" + settings.bigstitcher.fusion.fuse_dir )
+		def imageName = new File( settings.general.input_file ).getName()
 		// Make a folder for the registration and place the tiff file sequence in it
 		// Get the filename
 		
@@ -363,8 +371,41 @@ class StitchAndResave {
 		
 		// If the reorientation did not take place, use the one provided by the user
 		def orientation = "asr"
-		if( !settings.general_parameters.do_reorientation ) {
-			orientation = settings.general_parameters.orientation_acquisition.toLowerCase()
+		if( !settings.bigstitcher.reorientation.reorient_to_asr ) {
+			orientation = settings.bigstitcher.reorientation.raw_orientation.toLowerCase()
+		}
+		// Execute the docker command, these need to be added to the yml
+		//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
+		runBrainreg(fileNames[0].getParent(), fileNames[0].getParent()+"registered", voxelSize, extras )
+	
+	}
+	
+	def runRegistration() {
+        addToLog( "Getting voxel size for dataset", false ) 
+		def xml = readXML( settings.bigstitcher.xml_file )
+		def voxelSize = Double.parseDouble( xml.SequenceDescription.ViewSetups.ViewSetup[0].voxelSize.size.text().split(" ").min()) * settings.bigstitcher.fusion.downsampling
+		
+		// Number of channels
+		def nC = xml.SequenceDescription.ViewSetups.Attributes.findAll{ it.@name == "channel" }.Channel.size()
+		
+		def fusedDirectory = new File( settings.general.output_dir + "/" + settings.bigstitcher.fusion.fuse_dir )
+		def imageName = new File( settings.general.input_file ).getName()
+		// Make a folder for the registration and place the tiff file sequence in it
+		// Get the filename
+		
+		def fileNames = (0..(nC-1)).collect{ new File( fusedDirectory, imageName + "_fused_tp_0_ch_${it}.tif") }
+		
+		def extras = ""
+		// Append extra channels
+		if( fileNames.size() > 1 ) {
+			extras = " -a " + fileNames.collect{ "\"$it\"" }.join(" ")
+		}
+		IJ.log( extras )
+		
+		// If the reorientation did not take place, use the one provided by the user
+		def orientation = "asr"
+		if( !settings.bigstitcher.reorientation.reorient_to_asr ) {
+			orientation = settings.bigstitcher.reorientation.raw_orientation.toLowerCase()
 		}
 		// Execute the docker command, these need to be added to the yml
 		//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
@@ -373,6 +414,13 @@ class StitchAndResave {
 		def task = processString.execute()
 		task.waitForProcessOutput(System.out, System.err)
 		
+	}
+	
+	def runBrainreg( def input, def outputFolder, def voxelSize, def extras ) {
+		def processString = "mamba activate brainreg & brainreg ${input} ${outputFolder} -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
+		IJ.log( processString )
+		def task = processString.execute()
+		task.waitForProcessOutput(System.out, System.err)
 	}
  
     def addToLog( def message, boolean logTimeSinceLast ) { 

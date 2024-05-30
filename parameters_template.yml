@@ -38,3 +38,5 @@ brainreg:
     atlas_registration: false
     docker_container_name: biop-brainreg
     extra_parameters:
+brainmapper:
+    threshold: 10
