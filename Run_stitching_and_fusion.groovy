@@ -12,19 +12,19 @@ import java.time.Duration
 		 
 def resaver = new StitchAndResave( yamlFile ) 
 
-resaver.createBigStitcherDataset() 
+//resaver.createBigStitcherDataset() 
 
-//resaver.alignChannels() 
-//resaver.stitchTiles() 
+resaver.alignChannels() 
+resaver.stitchTiles() 
  
 
 //Reorientation 
-//resaver.toASR( )
+resaver.toASR( )
 
 // Fusion 
-//resaver.fuseDataset( )
+resaver.fuseDataset( )
 
-//resaver.runRegistration2()
+resaver.runRegistration()
 
  
 class StitchAndResave { 
@@ -383,6 +383,9 @@ class StitchAndResave {
 	}
 	
 	def runRegistration() {
+		
+		if( settings.brainreg.atlas_registration== false ) return
+		
         addToLog( "Getting voxel size for dataset", false ) 
 		def xml = readXML( settings.bigstitcher.xml_file )
 		def voxelSize = Double.parseDouble( xml.SequenceDescription.ViewSetups.ViewSetup[0].voxelSize.size.text().split(" ").min()) * settings.bigstitcher.fusion.downsampling
@@ -409,16 +412,20 @@ class StitchAndResave {
 		if( !settings.bigstitcher.reorientation.reorient_to_asr ) {
 			orientation = settings.bigstitcher.reorientation.raw_orientation.toLowerCase()
 		}
-		// Execute the docker command, these need to be added to the yml
-		//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
-		def processString = "docker run -t -v \"${fileNames[0].getParent()}\":\"/stitching\" ${settings.brainreg.docker_container_name} brainreg /stitching/${fileNames[0].getName()} stitching/registered -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
-		IJ.log( processString )
-		def task = processString.execute()
-		task.waitForProcessOutput(System.out, System.err)
 		
+		if (settings.brainreg.conda_environement_name != null ) {
+			runBrainreg(fileNames[0].getParent(), fileNames[0].getParent()+"registered", voxelSize, orientation, extras )
+		} else {
+			// Execute the docker command, these need to be added to the yml
+			//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
+			def processString = "docker run -t -v \"${fileNames[0].getParent()}\":\"/stitching\" ${settings.brainreg.docker_container_name} brainreg /stitching/${fileNames[0].getName()} stitching/registered -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
+			IJ.log( processString )
+			def task = processString.execute()
+			task.waitForProcessOutput(System.out, System.err)
+		}
 	}
 	
-	def runBrainreg( def input, def outputFolder, def voxelSize, def extras ) {
+	def runBrainreg( def input, def outputFolder, def voxelSize, def orientation, def extras ) {
 		def processString = "conda activate brainreg & brainreg ${input} ${outputFolder} -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
 		IJ.log( processString )
 		def task = processString.execute()
