@@ -35,8 +35,7 @@ bigstitcher:
       fusion_method: "SMOOTH AVERAGE"
       fuse_dir: fused
 brainreg:
-    atlas_registration: false
-    docker_container_name: biop-brainreg
+    atlas_registration: true
+    docker_container_name:
+    conda_environement_name: 
     extra_parameters:
-brainmapper:
-    threshold: 10

@@ -14,17 +14,17 @@ def resaver = new StitchAndResave( yamlFile )
 
 resaver.createBigStitcherDataset() 
 
-resaver.alignChannels() 
-resaver.stitchTiles() 
+//resaver.alignChannels() 
+//resaver.stitchTiles() 
  
 
 //Reorientation 
-resaver.toASR( )
+//resaver.toASR( )
 
 // Fusion 
-resaver.fuseDataset( )
+//resaver.fuseDataset( )
 
-resaver.runRegistration2()
+//resaver.runRegistration2()
 
  
 class StitchAndResave { 
@@ -50,7 +50,9 @@ class StitchAndResave {
             addToLog( "INFO: Start Fast reader", false ) 
             // addToLog( "Loading/Resaving time = ") 
             // Import CZI file and resave it in xml format 
-            IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general.input_file + "] output_folder=[" + settings.general.output_dir + "]") 
+            //IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general.input_file + "] output_folder=[" + settings.general.output_dir + "]") 
+            IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general.input_file + "] erase_if_file_already_exists=true xml_out=["+settings.bigstitcher.xml_file+"]");
+            
             // Import dataset into bigsticher 
  
             addToLog("INFO: Fast reader DONE", true ) 
@@ -417,7 +419,7 @@ class StitchAndResave {
 	}
 	
 	def runBrainreg( def input, def outputFolder, def voxelSize, def extras ) {
-		def processString = "mamba activate brainreg & brainreg ${input} ${outputFolder} -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
+		def processString = "conda activate brainreg & brainreg ${input} ${outputFolder} -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
 		IJ.log( processString )
 		def task = processString.execute()
 		task.waitForProcessOutput(System.out, System.err)
