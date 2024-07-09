@@ -1,5 +1,8 @@
 target
 
+### Snakemake temp
+.snakemake
+
 ### IntelliJ IDEA ###
 /idea/
 .idea/

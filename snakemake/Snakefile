@@ -1,0 +1,16 @@
+# Snakemake file: Snakefile
+
+# Define the input directory
+input_dir = "F:/Lightsheet Workflows/analysis/"
+
+# Define a rule to process each file
+rule process_file:
+    input:
+        "F:/Lightsheet Workflows/analysis/Olivier_Burri/{mouse}/{brain}_parameters.yml"
+    output:
+        "processed_files/{mouse}//{brain}_output.txt"
+    shell:
+        """
+        # Command to process the file
+        process_command --input {input} --output {output}
+        """

@@ -1,0 +1,41 @@
+general:
+  user: Olivier Burri
+  save_dir: F:\Lightsheet Workflows\analysis
+bigstitcher:
+    xml_file: 
+    reader: fast
+    fusion: fast
+    channel_alignment:
+      pairwise_shifts_downsamples:
+        x: 4
+        y: 4
+        z: 2
+      filter_min_r: 0.7
+    tile_alignment:
+      use_channel: 0
+      pairwise_shifts_downsamples:
+        x: 4
+        y: 4
+        z: 2
+      filter_min_r: 0.7
+    icp_refinement:
+      icp_refinement_type: Simple (all together)
+      downsampling: Downsampling 8/8/4
+      interest: Average Threshold
+      icp_max_error: Normal Adjustment (<5px)
+    reorientation:
+      raw_orientation: IPL
+      reorient_to_asr: true # Choose false if you do not want to reorient your sample
+    fusion:
+      fusion_type: bigstitcher
+      downsampling: 8
+      preserve_original: #preserve_original # Or select nothing, especially if you reorient your sample
+      produce: Each timepoint & channel
+      fused_image: Save as (compressed) TIFF stacks
+      fusion_method: "SMOOTH AVERAGE"
+      fuse_dir: fused
+brainreg:
+    atlas_registration: true
+    docker_container_name:
+    conda_environement_name: 
+    extra_parameters:

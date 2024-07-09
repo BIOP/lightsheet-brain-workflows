@@ -1,18 +1,67 @@
-# lightsheet-brain-workflows
+# Lightsheet Brain Workflows
 
 Code to format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy.
 Work in progress.
 
-#### Setup
-...
+Right now this repo allows you to process lighsheet data from CZI files though BigStitcher and Brainreg
 
-#### Basic running instructions
-- Copy and edit the `parameters_ref.yml` file in `resources` with your username (FirstName_LastName).
-- Make sure raw data and analysis paths match are correct.
-- Open the `guiBuilder.groovy` file in Fiji.
-- Click "Run" to compile.
-- A window will open asking for your parameter file.
-- Fill in the fields and Start.
+# About
+The goal of this repository is to build tools to allow for the scalable stitching fusing and processing of tiled  lightsheet data using existing tools.
+
+## Rationale
+
+# Local usage
+
+## Installation
+
+### This repo
+
+Download and unzip this repository somewhere
+
+### Fiji 
+
+You must have a working Fiji installation with the BigStitcher update site enabled
+1. Start Fiji and go to Help > Update
+2. Click on "Manage update sites"
+3. Check BigStitcher
+4. Click on Save and close and restart Fiji
+
+### BrainReg
+
+You can install brainreg and the 25um Allen mouse brain with the following commands
+
+```
+conda create -n brainreg python==3.11 -y
+conda activate brainreg
+conda install -y -c conda-forge brainreg
+brainglobe install -a allen_mouse_25um
+pip install brainglobe-atlasapi
+```
+
+## Use 
+
+### Prepare for processing
+1. From within Fiji, run the script called `YamlGuiCreator.groovy` 
+2. You will be prompted for an input YML file, select the `parameters_template.yml` file
+3. On the GUI, fill in the necessary fields
+	- Under General: Specify your user name and the directory where you would like your processing data to be saved
+	- BigStitcher tab: These are the parameters for stitching and fusing the lighthseet data. 
+	- Brainreg tab: For local usage, specify your conda environment name that you installed using the instructions above 
+4. Run tab: Select one or more folders containing CZI files for processing
+7. Click on Save
+
+This will produce on YML file per CZI file in the save directory 
+
+### Run processing
+
+Open the script `Run_stitching_and_fusion.groovy`
+
+Run the script and select a single YML file in your output directory. This will process the entire brain
+
+
+# Cluster usage
+
+Work in progress
 
 
 #### Brain orientation
