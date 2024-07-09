@@ -12,7 +12,7 @@ import java.time.Duration
 		 
 def resaver = new StitchAndResave( yamlFile ) 
 
-//resaver.createBigStitcherDataset() 
+resaver.createBigStitcherDataset() 
 
 resaver.alignChannels() 
 resaver.stitchTiles() 
@@ -83,11 +83,11 @@ class StitchAndResave {
         addToLog( "Fixing channel names and IDs", false ) 
 		def xml = new XmlSlurper().parse(settings.bigstitcher.xml_file) 
 		def channels = xml.SequenceDescription.ViewSetups.Attributes.findAll{ it.@name == "channel" } 
-		 
+
 		// Make sure channels have names matching the ID		 
-		channels.each{ c -> 
-			def id = c.Channel.id.text() 
-			c.Channel.name = id 
+		channels.Channel.each{ c -> 
+			def id = c.id.text()
+			c.name = id 
 		} 
 		 
 		// Save it. If the character set is not UTF 8 then Bitstitcher will complain 
