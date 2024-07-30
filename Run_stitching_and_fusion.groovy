@@ -12,17 +12,17 @@ import java.time.Duration
 		 
 def resaver = new StitchAndResave( yamlFile ) 
 
-resaver.createBigStitcherDataset() 
+//resaver.createBigStitcherDataset() 
 
-resaver.alignChannels() 
-resaver.stitchTiles() 
+//resaver.alignChannels() 
+//resaver.stitchTiles() 
  
 
 //Reorientation 
-resaver.toASR( )
+//resaver.toASR( )
 
 // Fusion 
-resaver.fuseDataset( )
+//resaver.fuseDataset( )
 
 resaver.runRegistration()
 
@@ -125,7 +125,7 @@ class StitchAndResave {
                 "downsample_in_z=" + settings.bigstitcher.channel_alignment.pairwise_shifts_downsamples.z + " " + 
                 "channels=[use Channel 0] " 
         ) 
-        //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " + 
+        //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " + This was fixed by Oli
  
  
          
@@ -378,7 +378,7 @@ class StitchAndResave {
 		}
 		// Execute the docker command, these need to be added to the yml
 		//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
-		runBrainreg(fileNames[0].getParent(), fileNames[0].getParent()+"registered", voxelSize, extras )
+		runBrainreg(fileNames[0], fileNames[0].getParent()+"/registered", voxelSize, extras )
 	
 	}
 	
@@ -403,7 +403,7 @@ class StitchAndResave {
 		def extras = ""
 		// Append extra channels
 		if( fileNames.size() > 1 ) {
-			extras = " -a " + fileNames.collect{ "\"$it\"" }.join(" ")
+			extras = "-a " + fileNames.collect{ "\"$it\"" }.join(" ")
 		}
 		IJ.log( extras )
 		
@@ -414,7 +414,7 @@ class StitchAndResave {
 		}
 		
 		if (settings.brainreg.conda_environement_name != null ) {
-			runBrainreg(fileNames[0].getParent(), fileNames[0].getParent()+"registered", voxelSize, orientation, extras )
+			runBrainreg(fileNames[0], fileNames[0].getParent()+"/registered", voxelSize, orientation, extras )
 		} else {
 			// Execute the docker command, these need to be added to the yml
 			//'''docker run -t -v "F:\Lightsheet Workflows\analysis\Olivier_Burri\AB001\export":"/stitching" brainreg brainreg /stitching /stitching/registered -v 2 2 100 --orientation ial'''
@@ -426,7 +426,16 @@ class StitchAndResave {
 	}
 	
 	def runBrainreg( def input, def outputFolder, def voxelSize, def orientation, def extras ) {
-		def processString = "conda activate brainreg & brainreg ${input} ${outputFolder} -v $voxelSize $voxelSize $voxelSize --orientation $orientation$extras"
+		// Get all parameters from the yaml
+		def brainregSettings = settings.brainreg.parameters.collect{ p ->
+			if (p.getValue() instanceof Boolean ) {
+				if( p.getValue() ) return "--${p.getKey()}"
+			} else {
+				return "--${p.getKey()} ${p.getValue()}"
+			}
+		}.join(" ")
+		
+		def processString = settings.brainreg.conda_activate_path+" activate brainreg & brainreg \"${input}\" \"${outputFolder}\" -v $voxelSize $voxelSize $voxelSize --orientation $orientation $brainregSettings $extras"
 		IJ.log( processString )
 		def task = processString.execute()
 		task.waitForProcessOutput(System.out, System.err)

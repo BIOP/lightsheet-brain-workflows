@@ -35,7 +35,25 @@ bigstitcher:
       fusion_method: "SMOOTH AVERAGE"
       fuse_dir: fused
 brainreg:
-    atlas_registration: true
     docker_container_name:
-    conda_environement_name: 
-    extra_parameters:
+    conda_environement_name: brainreg
+    conda_activate_path: "C:\\ProgramData\\mambaforge\\condabin\\mamba.bat"
+    parameters:
+        atlas: allen_mouse_25um
+        backend: niftyreg
+        affine-n-steps: 6
+        affine-use-n-steps: 5
+        freeform-n-steps: 6
+        freeform-use-n-steps: 4
+        bending-energy-weight: 0.95
+        grid-spacing: -10
+        smoothing-sigma-reference: -1.0
+        smoothing-sigma-floating: -1.0
+        histogram-n-bins-floating: 128
+        histogram-n-bins-reference: 128
+        n-free-cpus: 2
+        debug: true
+        save-original-orientation: true
+        brain_geometry: full
+        sort-input-file: true
+        pre-processing: default
