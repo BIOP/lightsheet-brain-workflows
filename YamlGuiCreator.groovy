@@ -23,6 +23,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.FlowLayout
 import java.awt.Insets;
+import java.awt.dnd.DropTarget
+import java.awt.dnd.DropTargetListener
+import java.awt.dnd.DropTargetEvent
+import java.awt.dnd.DropTargetDragEvent
+import java.awt.dnd.DropTargetDropEvent
+import java.awt.dnd.DnDConstants
+import java.awt.datatransfer.DataFlavor
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JOptionPane; 
@@ -140,6 +147,7 @@ public class Dialog extends JFrame {
 		
 		JTextArea textArea = new JTextArea();
 		textArea.setPreferredSize(new Dimension(300, 20));
+		
 
 		JButton bnAddFolders = new JButton("Add folders");
 		bnAddFolders.addActionListener(e->{
@@ -178,6 +186,7 @@ public class Dialog extends JFrame {
 			finalMessage.setText("<html>"+message+"</html>")
 		})
 		
+		enableDragAndDrop(textArea, finalMessage)
 		
 		GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.BOTH;
@@ -212,6 +221,53 @@ public class Dialog extends JFrame {
         tabPanel.add(finalMessage, constraints);
         
     	return tabPanel
+    }
+    
+     private void enableDragAndDrop(textArea, finalMessage){
+        DropTarget target=new DropTarget(textArea, new DropTargetListener(){
+            public void dragEnter(DropTargetDragEvent e)
+            {
+            }
+            
+            public void dragExit(DropTargetEvent e)
+            {
+            }
+            
+            public void dragOver(DropTargetDragEvent e)
+            {
+            }
+            
+            public void dropActionChanged(DropTargetDragEvent e)
+            {
+            
+            }
+            
+            public void drop(DropTargetDropEvent e)
+            {
+                // Accept the drop first, important!
+                e.acceptDrop(DnDConstants.ACTION_COPY);
+                
+                // Get the files that are dropped as java.util.List
+                List<File> list = ((List<File>)e.getTransferable().getTransferData(DataFlavor.javaFileListFlavor))
+                
+                def files = []
+                def errorMessages = []
+                list.each{file -> 
+                	if(file.isDirectory())
+                		files.add(file)
+                	else
+                		errorMessages.add("'"+file.getName()+"' is a file, not a folder ! Cannot be added to the list")
+                }
+                
+                if(!errorMessages.isEmpty()){
+                	finalMessage.setText("<html>'"+errorMessages.join("<br>")+"</html>")
+                }
+                
+                // Now get the first file from the list,
+                def previousText = textArea.getText()
+            	textArea.setText(previousText + files.join("\n") + "\n");
+            }
+        });
     }
     
     /**
