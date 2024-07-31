@@ -158,9 +158,11 @@ public class Dialog extends JFrame {
             directoryChooser.setDialogTitle("Choose the CZI folders");
             directoryChooser.showDialog(new JDialog(),"Select");
 
-            if (directoryChooser.getSelectedFiles() != null){
+			def selectedFiles = directoryChooser.getSelectedFiles()
+            if (selectedFiles != null){
             	def previousText = textArea.getText()
-                textArea.setText(previousText + directoryChooser.getSelectedFiles().join("\n") + "\n");
+            	selectedFiles.collect{f-> f.getAbsolutePath()}.add(0, previousText)
+                textArea.setText(selectedFiles.join("\n"));
                 currentDir = directoryChooser.getSelectedFile()
                 IJ.setProperty(DEFAULT_PATH_KEY, currentDir)
             }
@@ -171,19 +173,21 @@ public class Dialog extends JFrame {
     		textArea.setText("");
 		})
 		
-		JLabel finalMessage = new JLabel("")
+		JLabel finalMessage = new JLabel("<html>--- Logger ---</html>")
 		JButton bnSave = new JButton("Save");
 		// add listener on Ok and Cancel button
 		bnSave.addActionListener(e->{
 			def text = textArea.getText()
-			def message = ""
+			def messages = []
+			messages.add(finalMessage.getText().replace("<html>","").replace("</html>",""))
+			
 			if(text.isEmpty() ){
-				message += "You have to select at least one CZI folder and the analysis folder !"
+				messages.add("<p style='color:orange;'>You have to select at least one CZI folder and the analysis folder !</p>")
 			}else{
 				def cziFolders = text.split("\n")
-				message = saveYamlParameters(yamlConfig, cziFolders)
+				messages.addAll(saveYamlParameters(yamlConfig, cziFolders))
 			}
-			finalMessage.setText("<html>"+message+"</html>")
+			finalMessage.setText("<html>"+messages.join(" ")+"</html>")
 		})
 		
 		enableDragAndDrop(textArea, finalMessage)
@@ -256,16 +260,19 @@ public class Dialog extends JFrame {
                 	if(file.isDirectory())
                 		files.add(file)
                 	else
-                		errorMessages.add("'"+file.getName()+"' is a file, not a folder ! Cannot be added to the list")
+                		errorMessages.add("<p style='color:orange;'>'"+file.getName()+"' is a file, not a folder ! Cannot be added to the list</p>")
                 }
                 
                 if(!errorMessages.isEmpty()){
-                	finalMessage.setText("<html>'"+errorMessages.join("<br>")+"</html>")
+                	def previousText = finalMessage.getText().replace("<html>","").replace("</html>","")
+                	errorMessages.add(0, previousText)
+                	finalMessage.setText("<html>"+errorMessages.join(" ")+"</html>")
                 }
                 
                 // Now get the first file from the list,
                 def previousText = textArea.getText()
-            	textArea.setText(previousText + files.join("\n") + "\n");
+                files.add(0, previousText)
+            	textArea.setText(files.join("\n"));
             }
         });
     }
@@ -453,13 +460,14 @@ public class Dialog extends JFrame {
 	 */
 	def saveYamlParameters(yamlConfig, cziFolders){
 		def filesToAnalyse = []
-		def message = ""
+		def messages = []
 		
 		def user = yamlConfig.general.user
 		def analysisFolder = yamlConfig.general.save_dir
 		
 		if(!(new File(analysisFolder)).exists()){
-			return "The analysis folder doesn't exists ! Please enter a valid one.<br>"
+			messages.add("<p style='color:red;'>The analysis folder doesn't exists ! Please enter a valid one.</p>")
+			return messages
 		}
 		
 		// Create folder in analysis folder
@@ -476,7 +484,7 @@ public class Dialog extends JFrame {
 			    	}
 			    }
 			}else{
-				message += "The folder '"+folder.getName()+"' doesn't exists ! Cannot save the YAML file.<br>"
+				messages.add("<p style='color:red;'>The folder '"+folder.getName()+"' doesn't exists ! Cannot save the YAML file.</p>")
 			}
 		}
 		
@@ -498,9 +506,9 @@ public class Dialog extends JFrame {
 			yamlConfig.bigstitcher.xml_file = bigStitcherXMLFile.toString()
 		
 			saveYamlToFile(yamlConfig, localYamlConfigFile)
-			message += "YAML file saved for '"+cziFile.getName()+"'<br>"
+			messages.add("<p style='color:green;'>YAML file saved for '"+cziFile.getName()+"'</p>")
 		}
-		return message
+		return messages
 	}
 	
 	/**
