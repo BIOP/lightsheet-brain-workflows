@@ -146,8 +146,9 @@ public class Dialog extends JFrame {
 		def layout = new GroupLayout(tabPanel);
 		
 		JTextArea textArea = new JTextArea();
-		textArea.setPreferredSize(new Dimension(300, 20));
-		
+		JScrollPane scrollTextArea = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollTextArea.setBounds(3, 3, 350, 250);
+		scrollTextArea.setPreferredSize(new Dimension(400, 300));
 
 		JButton bnAddFolders = new JButton("Add folders");
 		bnAddFolders.addActionListener(e->{
@@ -161,8 +162,10 @@ public class Dialog extends JFrame {
 			def selectedFiles = directoryChooser.getSelectedFiles()
             if (selectedFiles != null){
             	def previousText = textArea.getText()
-            	selectedFiles.collect{f-> f.getAbsolutePath()}.add(0, previousText)
-                textArea.setText(selectedFiles.join("\n"));
+            	def textList = selectedFiles.collect{f-> f.getAbsolutePath()}
+            	if(!previousText.isEmpty())
+            		textList.add(0, previousText)
+                textArea.setText(textList.join("\n"));
                 currentDir = directoryChooser.getSelectedFile()
                 IJ.setProperty(DEFAULT_PATH_KEY, currentDir)
             }
@@ -203,7 +206,7 @@ public class Dialog extends JFrame {
 		constraints.gridheight = 5;
         constraints.gridx = 0;
         constraints.gridy = settingsRow;
-        tabPanel.add(textArea, constraints);
+        tabPanel.add(scrollTextArea, constraints);
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         
@@ -271,7 +274,8 @@ public class Dialog extends JFrame {
                 
                 // Now get the first file from the list,
                 def previousText = textArea.getText()
-                files.add(0, previousText)
+                if(!previousText.isEmpty())
+                	files.add(0, previousText)
             	textArea.setText(files.join("\n"));
             }
         });
