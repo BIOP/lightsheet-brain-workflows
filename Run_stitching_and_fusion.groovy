@@ -126,6 +126,9 @@ class StitchAndResave {
                 "channels=[use Channel 0] " 
         ) 
         //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " --> This was fixed by Oli
+
+
+
  
  
          
