@@ -12,17 +12,17 @@ import java.time.Duration
 		 
 def resaver = new StitchAndResave( yamlFile ) 
 
-//resaver.createBigStitcherDataset() 
+resaver.createBigStitcherDataset() 
 
-//resaver.alignChannels() 
-//resaver.stitchTiles() 
+resaver.alignChannels() 
+resaver.stitchTiles() 
  
 
 //Reorientation 
-//resaver.toASR( )
+resaver.toASR( )
 
 // Fusion 
-//resaver.fuseDataset( )
+resaver.fuseDataset( )
 
 resaver.runRegistration()
 
@@ -125,7 +125,7 @@ class StitchAndResave {
                 "downsample_in_z=" + settings.bigstitcher.channel_alignment.pairwise_shifts_downsamples.z + " " + 
                 "channels=[use Channel 0] " 
         ) 
-        //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " + This was fixed by Oli
+        //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " --> This was fixed by Oli
  
  
          
