@@ -125,7 +125,8 @@ class StitchAndResave {
                 "downsample_in_z=" + settings.bigstitcher.channel_alignment.pairwise_shifts_downsamples.z + " " + 
                 "channels=[use Channel 0] " 
         ) 
-        //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " + This was fixed by Oli
+        //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " + 
+This was fixed by Oli
  
  
          
