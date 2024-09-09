@@ -276,7 +276,19 @@ class StitchAndResave {
 		if ( t.containsKey( originalOrientation ) ) { 
 			t[originalOrientation].each{ p -> 
 				// Build the command  
-				def command = "select=[${settings.bigstitcher.xml_file}] apply_to_angle=[All angles] apply_to_channel=[All channels] apply_to_illumination=[All illuminations] apply_to_tile=[All tiles] apply_to_timepoint=[All Timepoints] transformation=Rigid apply=[Current view transformations (appends to current transforms)] define=[Rotation around axis] same_transformation_for_all_tiles axis_timepoint_0_channel_0_illumination_0_angle_0=${p.axis} rotation_timepoint_0_channel_0_illumination_0_angle_0=${p.angle}" 
+				def command = "select=[${settings.bigstitcher.xml_file}] "+
+							  "apply_to_angle=[All angles] "+
+							  "apply_to_channel=[All channels] "+
+							  "apply_to_illumination=[All illuminations] "+
+							  "apply_to_tile=[All tiles] "+
+							  "apply_to_timepoint=[All Timepoints] "+
+							  "transformation=Rigid "+
+							  "apply=[Current view transformations (appends to current transforms)] "+
+							  "define=[Rotation around axis] "+
+							  "same_transformation_for_all_channels "+
+							  "same_transformation_for_all_tiles "+
+							  "axis_timepoint_0_all_channels_illumination_0_angle_0=${p.axis} "+
+							  "rotation_timepoint_0_all_channels_illumination_0_angle_0=${p.angle}" 				
 				IJ.log( command ) 
 				// Run it 
 				IJ.run("Apply Transformations", command) 
