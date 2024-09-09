@@ -1,7 +1,13 @@
 @Grab('org.yaml:snakeyaml:2.2') 
  
 #@ File yamlFile 
-#@ LogService log 
+#@ Boolean doCreateDataset (label="Create BigStitcher dataset")
+#@ Boolean doChannelAlignment (label="Perform channel alignment")
+#@ Boolean doStitchTiles (label="Stitch tiles")
+#@ Boolean doASRReorientation (label="Reorient to ASR")
+#@ Boolean doFusion (label="Export fused image")
+#@ Boolean doBrainreg (label="Run Brainreg")
+#@ LogService log
  
 import org.yaml.snakeyaml.Yaml 
 import groovy.xml.XmlSlurper 
@@ -12,21 +18,19 @@ import java.time.Duration
 		 
 def resaver = new StitchAndResave( yamlFile ) 
 
-resaver.createBigStitcherDataset() 
+if ( doCreateDataset ) resaver.createBigStitcherDataset() 
 
-resaver.alignChannels() 
-resaver.stitchTiles() 
+if ( doChannelAlignment ) resaver.alignChannels() 
+
+if ( doStitchTiles ) resaver.stitchTiles() 
  
+if ( doASRReorientation ) resaver.toASR( )
 
-//Reorientation 
-resaver.toASR( )
+if ( doFusion ) resaver.fuseDataset( )
 
-// Fusion 
-resaver.fuseDataset( )
+if ( doBrainreg ) resaver.runRegistration()
 
-resaver.runRegistration()
 
- 
 class StitchAndResave { 
 	def settings 
 	def nTiles = 0 // Number of tiles, for "Fix view" during alignment 
