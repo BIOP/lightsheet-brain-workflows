@@ -39,7 +39,7 @@ class StitchAndResave {
 	 
 	StitchAndResave( def yamlFile ) { 
 			Yaml parser = new Yaml() 
-			this.settings = parser.load( yamlFile.text ) 
+			this.settings = parser.load( yamlFile.text )
 			//settings.each{ IJ.log(it.toString()) } 
 	} 
 	 
@@ -58,8 +58,7 @@ class StitchAndResave {
             IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general.input_file + "] erase_if_file_already_exists=true xml_out=["+settings.bigstitcher.xml_file+"]");
             
             // Import dataset into bigsticher 
- 
-            addToLog("INFO: Fast reader DONE", true ) 
+            addToLog("INFO: Fast reader DONE", true )
             
         } else { 
 	        print("INFO: Start resaving", false) 
@@ -258,16 +257,18 @@ class StitchAndResave {
 		
 		def t = [:] 
 		t['IPL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90]] 
+		t['IAL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90], [axis:"z-axis", angle:180]] 
+
 		t['RAS'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]] 
 		t['SAL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:90]]
 		t['PSL'] = [[axis:"y-axis", angle:180]]
 		t['PIR'] = [[axis:"x-axis", angle:180]]
 		t['LAI'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]]
+		
 		t['IAR'] = [[axis:"x-axis", angle:90]]
 		t['AIL'] = [[axis:"z-axis", angle:180]]
 		t['ASR'] = []
 		t['RPI'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:-90]]
-		t['IPL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90]]
 		t['LPS'] = [[axis:"y-axis", angle:90],  [axis:"x-axis", angle:-90]]
 		t['SPR'] = [[axis:"x-axis", angle:-90]]
 		
@@ -307,6 +308,7 @@ class StitchAndResave {
 		 
 		// Debug show the dataset 
 	    // IJ.run("BigStitcher", "browse=[" + settings.bigstitcher.xml_file + "] select=[" + settings.bigstitcher.xml_file + "]") 
+
 	} 
 	 
 	/*
@@ -427,7 +429,7 @@ class StitchAndResave {
 		IJ.log( extras )
 		
 		// If the reorientation did not take place, use the one provided by the user
-		def orientation = "asr"
+		def orientation = "asl" //changed this to asl before mirroring update
 		if( !settings.bigstitcher.reorientation.reorient_to_asr ) {
 			orientation = settings.bigstitcher.reorientation.raw_orientation.toLowerCase()
 		}
@@ -454,6 +456,7 @@ class StitchAndResave {
 			}
 		}.join(" ")
 		
+
 		def processString = settings.brainreg.conda_activate_path+" activate brainreg & brainreg \"${input}\" \"${outputFolder}\" -v $voxelSize $voxelSize $voxelSize --orientation $orientation $brainregSettings $extras"
 		IJ.log( processString )
 		def task = processString.execute()
