@@ -1,0 +1,59 @@
+general:
+  user: Axel_Bisi
+  save_dir: M:\analysis\Axel_Bisi\ImagedBrains
+bigstitcher:
+    xml_file: 
+    reader: fast
+    fusion: fast
+    channel_alignment:
+      pairwise_shifts_downsamples:
+        x: 4
+        y: 4
+        z: 2
+      filter_min_r: 0.7
+    tile_alignment:
+      use_channel: 0
+      pairwise_shifts_downsamples:
+        x: 4
+        y: 4
+        z: 2
+      filter_min_r: 0.7
+    icp_refinement:
+      icp_refinement_type: Simple (all together)
+      downsampling: Downsampling 8/8/4
+      interest: Average Threshold
+      icp_max_error: Normal Adjustment (<5px)
+    reorientation:
+      raw_orientation: IPL
+      reorient_to_asr: true # Choose false if you do not want to reorient your sample
+    fusion:
+      fusion_type: bigstitcher
+      downsampling: 1
+      preserve_original: #preserve_original # Or select nothing, especially if you reorient your sample
+      produce: Each timepoint & channel
+      fused_image: Save as (compressed) TIFF stacks
+      fusion_method: "SMOOTH AVERAGE"
+      fuse_dir: fused
+brainreg:
+    docker_container_name:
+    conda_environement_name: brainreg
+    conda_activate_path: C:\ProgramData\miniforge3\condabin\conda.bat
+    parameters:
+        atlas: allen_mouse_bluebrain_barrels_10um
+        backend: niftyreg
+        affine-n-steps: 6
+        affine-use-n-steps: 5
+        freeform-n-steps: 6
+        freeform-use-n-steps: 4
+        bending-energy-weight: 0.8
+        grid-spacing: -10
+        smoothing-sigma-reference: -1.0
+        smoothing-sigma-floating: -1.0
+        histogram-n-bins-floating: 128
+        histogram-n-bins-reference: 128
+        n-free-cpus: 2
+        debug: true
+        save-original-orientation: true
+        brain_geometry: full
+        sort-input-file: true
+        pre-processing: default
