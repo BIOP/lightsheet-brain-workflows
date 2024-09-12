@@ -436,7 +436,9 @@ class StitchAndResave {
 		}  
 		IJ.log( extras )  
 		  
-		// If the reorientation did not take place, use the one provided by the user  
+		  
+		// If the reorientation did not take place, use the one provided by the user
+		def orientation = "asr"
 		if( !settings.bigstitcher.reorientation.reorient_to_asr ) {  
 			orientation = settings.bigstitcher.reorientation.raw_orientation.toLowerCase()  
 		}  
