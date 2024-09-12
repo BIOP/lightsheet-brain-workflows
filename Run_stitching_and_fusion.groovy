@@ -466,7 +466,7 @@ class StitchAndResave {
 		}.join(" ")  
 		  
  
-		def processString = settings.brainreg.conda_activate_path+" activate brainreg & brainreg \"${input}\" \"${outputFolder}\" -v $voxelSize $voxelSize $voxelSize --orientation $orientation $brainregSettings $extras"  
+		def processString = settings.brainreg.conda_activate_path+" activate  ${settings.brainreg.conda_environement_name} & brainreg \"${input}\" \"${outputFolder}\" -v $voxelSize $voxelSize $voxelSize --orientation $orientation $brainregSettings $extras"  
 		IJ.log( processString )  
 		def task = processString.execute()  
 		task.waitForProcessOutput(System.out, System.err)  
