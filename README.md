@@ -35,7 +35,7 @@ conda install -y -c conda-forge brainreg
 brainglobe install -a allen_mouse_bluebrain_barrels_10um
 ```
 
-Further documentation about brainreg, atlases and registration parameters can be found in the (BrainGlobe's dedicated documentation)[https://brainglobe.info/about.html].
+Further documentation about brainreg, atlases and registration parameters can be found in the [BrainGlobe's dedicated documentation](https://brainglobe.info/about.html).
 Any atlas unavailable locally will be downloaded upon first call, so there is no need to pre-download atlases. 
 But this can be done like so, once brainreg is installed.
 ```
@@ -77,8 +77,8 @@ The Fiji editor will display run errors.
 ### Downstream analyses of preprocessed brains
 
 After atlas registration using `brainreg`, downstream analyses include can be conveniently performed using BrainGlobe's other tool:
-1. (Silicon probe track segmentation)[https://brainglobe.info/tutorials/segmenting-1d-tracks.html] using `brainglobe-segmentation`
-2. (3D cell detection)[https://brainglobe.info/tutorials/cellfinder-detection.html] using `cellfinder` / `brainmapper`
+1. [Silicon probe track segmentation](https://brainglobe.info/tutorials/segmenting-1d-tracks.html) using `brainglobe-segmentation`
+2. [3D cell detection](https://brainglobe.info/tutorials/cellfinder-detection.html]) using `cellfinder` / `brainmapper`
 3. etc.
 
 Other applications that do not involve BrainGlobe's tool are of course also possible, starting from the fused image stacks or from the atlas-registered brain.
