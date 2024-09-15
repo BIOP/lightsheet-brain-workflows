@@ -106,3 +106,10 @@ BrainGlobe is maintained and evolving, regularly check for updates!
 	For example, the script will convert IAL to ASR (default coronal views). 
 	- Double-check that the re-oriented tiff stack is correct, ask yourself e.g. "should I see fluroescent signal in this hemisphere?".
 	
+	
+#### Atlas registration
+- Atlas registration is performed on ASR-oriented brains for easier control of registration quality, but could be done in any orientation.
+- From experience, a more intact brain (including olfactory bulbs) is essential for good registration.
+- Sufficient background fluorescence seems important to make sure all brain contours are included.
+- In case of abnormal illumination (e.g. due to blood stains), the registration "collapses" near the brain edges. Reducing the grid-spacing (-20, -30) ensure a constrained registration less prone to underfitting.
+	
