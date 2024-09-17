@@ -1,6 +1,6 @@
-# Lightsheet Brain Workflows
+# Lightsheet Brain Workflows 🔬🧠
 
-Code to format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy.
+Code to format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy. 
 
 This repository allows you to process lighsheet data from .czi files through BigStitcher and BrainGlobe's brainreg.
 
@@ -89,7 +89,7 @@ BrainGlobe is maintained and evolving, regularly check for updates!
 
 **Work in progress**.
 
-## Additional information
+# Additional information
 
 #### Brain orientation in the BrainGlobe's image space definition
 - The brain orientation must follow the three-letters [BrainGlobe image space definition](https://brainglobe.info/documentation/setting-up/image-definition.html) (see also [here](https://github.com/brainglobe/bg-space)), later used for atlas registration. This is in reference to the origin of the data (first, top left voxel).
