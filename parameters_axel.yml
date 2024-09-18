@@ -24,7 +24,7 @@ bigstitcher:
       interest: Average Threshold
       icp_max_error: Normal Adjustment (<5px)
     reorientation:
-      raw_orientation: IPL
+      raw_orientation: IAL
       reorient_to_asr: true # Choose false if you do not want to reorient your sample
     fusion:
       fusion_type: bigstitcher
@@ -46,7 +46,7 @@ brainreg:
         freeform-n-steps: 6
         freeform-use-n-steps: 4
         bending-energy-weight: 0.8
-        grid-spacing: -10
+        grid-spacing: -8
         smoothing-sigma-reference: -1.0
         smoothing-sigma-floating: -1.0
         histogram-n-bins-floating: 128
