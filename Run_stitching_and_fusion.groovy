@@ -99,15 +99,7 @@ class StitchAndResave {
 		writer.close()   
 		   
 		// Take advantage of this to get the number of tiles   
-		this.nTiles = xml.SequenceDescription.ViewSetups.Attributes.findAll{ it.@name == "tile" }.Tile.size()   
-		
-				
-		// Flip along the Y axis. This is a particularity of the Zeiss Lightsheet Z1
-		addToLog( "INFO: Flipping along Y axis", true )
-		
-		IJ.run("Apply Transformations", "select=[" + settings.bigstitcher.xml_file + "] apply_to_angle=[All angles] apply_to_channel=[All channels] apply_to_illumination=[All illuminations] apply_to_tile=[All tiles] apply_to_timepoint=[All Timepoints] transformation=Rigid apply=[Current view transformations (appends to current transforms)] define=Matrix same_transformation_for_all_channels same_transformation_for_all_tiles timepoint_0_all_channels_illumination_0_angle_0=[1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]");
-	    
-	    addToLog( "INFO: Flipping along Y axis DONE", true )
+		this.nTiles = xml.SequenceDescription.ViewSetups.Attributes.findAll{ it.@name == "tile" }.Tile.size()
 	    
 	    addToLog( "INFO: Resaving DONE", true )   
    
@@ -137,10 +129,6 @@ class StitchAndResave {
                 "channels=[use Channel 0] "   
         )   
         //I ommitted this otpion as it was giving me errors -> "channels=[use Channel Cam1] " --> This was fixed by Oli  
- 
- 
- 
-   
    
            
         IJ.run("Filter pairwise shifts ...", "select=[" + settings.bigstitcher.xml_file + "] " +   
@@ -326,8 +314,36 @@ class StitchAndResave {
 	/*   
 	 * Fuse   
 	 */   
-	def fuseDataset() {   
+	def fuseDataset() {
+		
+		// Check if there is a Y flip already, otherwise do it
+		// Flip along the Y axis. This is a particularity of the Zeiss Lightsheet Z1
+		def xml = readXML( settings.bigstitcher.xml_file )  
+		def flipTansform = xml.ViewRegistrations.ViewRegistration[0].ViewTransform.find{ it.Name.text().contains("Manually defined transformation (Rigid/Affine by matrix)") }
+		
+		if( flipTansform.isEmpty() ) {
+			addToLog( "INFO: Flipping along X axis", false )
+			
+			IJ.run( "Apply Transformations", "select=[" + settings.bigstitcher.xml_file + "] "+
+					"apply_to_angle=[All angles] "+
+					"apply_to_channel=[All channels] "+
+					"apply_to_illumination=[All illuminations] "+
+					"apply_to_tile=[All tiles] "+
+					"apply_to_timepoint=[All Timepoints] "+
+					"transformation=Rigid "+
+					"apply=[Current view transformations (appends to current transforms)] "+
+					"define=Matrix "+
+					"same_transformation_for_all_channels "+
+					"same_transformation_for_all_tiles "+
+					"timepoint_0_all_channels_illumination_0_angle_0=[-1.0, 0.0, 0.0, 0.0, "+
+																	  "0.0, 1.0, 0.0, 0.0, "+
+																	  "0.0, 0.0, 1.0, 0.0]");
+					
+			addToLog( "INFO: Flipping along X axis DONE", true )
+		}
+		
 		addToLog( "Start data fusion", false )  
+		
 		// Create fused directory  
 		def fusedDirectory = new File( settings.general.output_dir + "/" + settings.bigstitcher.fusion.fuse_dir )  
 		fusedDirectory.mkdirs()  
