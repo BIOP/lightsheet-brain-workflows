@@ -19,7 +19,7 @@ import java.time.Duration
 def resaver = new StitchAndResave( yamlFile ) 
  
 if ( doCreateDataset ) resaver.createBigStitcherDataset()   
-  
+
 if ( doChannelAlignment ) resaver.alignChannels()   
  
 if ( doStitchTiles ) resaver.stitchTiles()   
@@ -37,7 +37,8 @@ class StitchAndResave {
 	def logtrace = []   
 	def tic // For timing purposes   
 	   
-	StitchAndResave( def yamlFile ) {   
+	StitchAndResave( def yamlFile ) {
+			this.tic = System.nanoTime() 
 			Yaml parser = new Yaml()   
 			this.settings = parser.load( yamlFile.text ) 
 			//settings.each{ IJ.log(it.toString()) }   
@@ -249,24 +250,24 @@ class StitchAndResave {
 	 */   
 	def toASR() {   
 		// Make sure that it is written in caps   
-		def originalOrientation = settings.bigstitcher.reorientation.raw_orientation.toUpperCase()  
+		def originalOrientation = fixMirroring()
 		  
 		def t = [:]   
-		t['IPL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90]]  
-		t['IAL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90], [axis:"z-axis", angle:180]]  
+		t['ipl'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90]]  
+		t['ial'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:-90], [axis:"z-axis", angle:180]]  
  
-		t['RAS'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]]   
-		t['SAL'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:90]]  
-		t['PSL'] = [[axis:"y-axis", angle:180]]  
-		t['PIR'] = [[axis:"x-axis", angle:180]]  
-		t['LAI'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]]  
+		t['ras'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]]   
+		t['sal'] = [[axis:"y-axis", angle:180], [axis:"x-axis", angle:90]]  
+		t['psl'] = [[axis:"y-axis", angle:180]]  
+		t['pir'] = [[axis:"x-axis", angle:180]]  
+		t['lai'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:90]]  
 		 
-		t['IAR'] = [[axis:"x-axis", angle:90]]  
-		t['AIL'] = [[axis:"z-axis", angle:180]]  
-		t['ASR'] = []  
-		t['RPI'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:-90]]  
-		t['LPS'] = [[axis:"y-axis", angle:90],  [axis:"x-axis", angle:-90]]  
-		t['SPR'] = [[axis:"x-axis", angle:-90]]  
+		t['iar'] = [[axis:"x-axis", angle:90]]  
+		t['ail'] = [[axis:"z-axis", angle:180]]  
+		t['asr'] = []  
+		t['rpi'] = [[axis:"y-axis", angle:-90], [axis:"x-axis", angle:-90]]  
+		t['lps'] = [[axis:"y-axis", angle:90],  [axis:"x-axis", angle:-90]]  
+		t['spr'] = [[axis:"x-axis", angle:-90]]  
 		  
 		//... and so on   
 	   
@@ -315,33 +316,7 @@ class StitchAndResave {
 	 * Fuse   
 	 */   
 	def fuseDataset() {
-		
-		// Check if there is a Y flip already, otherwise do it
-		// Flip along the Y axis. This is a particularity of the Zeiss Lightsheet Z1
-		def xml = readXML( settings.bigstitcher.xml_file )  
-		def flipTansform = xml.ViewRegistrations.ViewRegistration[0].ViewTransform.find{ it.Name.text().contains("Manually defined transformation (Rigid/Affine by matrix)") }
-		
-		if( flipTansform.isEmpty() ) {
-			addToLog( "INFO: Flipping along X axis", false )
-			
-			IJ.run( "Apply Transformations", "select=[" + settings.bigstitcher.xml_file + "] "+
-					"apply_to_angle=[All angles] "+
-					"apply_to_channel=[All channels] "+
-					"apply_to_illumination=[All illuminations] "+
-					"apply_to_tile=[All tiles] "+
-					"apply_to_timepoint=[All Timepoints] "+
-					"transformation=Rigid "+
-					"apply=[Current view transformations (appends to current transforms)] "+
-					"define=Matrix "+
-					"same_transformation_for_all_channels "+
-					"same_transformation_for_all_tiles "+
-					"timepoint_0_all_channels_illumination_0_angle_0=[-1.0, 0.0, 0.0, 0.0, "+
-																	  "0.0, 1.0, 0.0, 0.0, "+
-																	  "0.0, 0.0, 1.0, 0.0]");
-					
-			addToLog( "INFO: Flipping along X axis DONE", true )
-		}
-		
+				
 		addToLog( "Start data fusion", false )  
 		
 		// Create fused directory  
@@ -486,12 +461,66 @@ class StitchAndResave {
 		IJ.log( processString )  
 		def task = processString.execute()  
 		task.waitForProcessOutput(System.out, System.err)  
-	}  
+	}
+	
+	def fixMirroring() {
+		def orientation = settings.bigstitcher.reorientation.raw_orientation.toLowerCase()
+		def mirrorOrientations =  [ "psr":"psl",
+									"pil":"pir", 
+									"rps":"ras", 
+									"sar":"sal", 
+									"lap":"lai", 
+									"ial":"iar", 
+									"air":"ail", 
+									"asl":"asr",
+									"rai":"rpi", 
+									"ipr":"ipl", 
+									"lpi":"lps", 
+									"spl":"spr" 
+								  ]
+	if( orientation in mirrorOrientations.keySet() ) {
+		// Check transform exists
+		def xml = readXML( settings.bigstitcher.xml_file )  
+		def flipTansform = xml.ViewRegistrations.ViewRegistration[0].ViewTransform.find{ it.Name.text().contains("Manually defined transformation (Rigid/Affine by matrix)") }
+		
+		addToLog( "INFO: Flipping along X axis", false )
+		
+		if( flipTansform.isEmpty() ) {
+
+			
+			IJ.run( "Apply Transformations", "select=[" + settings.bigstitcher.xml_file + "] "+
+					"apply_to_angle=[All angles] "+
+					"apply_to_channel=[All channels] "+
+					"apply_to_illumination=[All illuminations] "+
+					"apply_to_tile=[All tiles] "+
+					"apply_to_timepoint=[All Timepoints] "+
+					"transformation=Rigid "+
+					"apply=[Current view transformations (appends to current transforms)] "+
+					"define=Matrix "+
+					"same_transformation_for_all_channels "+
+					"same_transformation_for_all_tiles "+
+					"timepoint_0_all_channels_illumination_0_angle_0=[-1.0, 0.0, 0.0, 0.0, "+
+																	  "0.0, 1.0, 0.0, 0.0, "+
+																	  "0.0, 0.0, 1.0, 0.0]");
+					
+			addToLog( "INFO: Flipping along X axis DONE", true )
+		} else {
+			
+			addToLog( "INFO: Flipping along X axis not necessary, already in XML metadata", true )	
+		}
+			return mirrorOrientations[orientation]
+			
+		} else {
+			addToLog( "INFO: Orientation " + orientation + " not in flipped orientation database, returning orientation as-is", true )
+			return orientation
+		}
+	}
+	
    
     def addToLog( def message, boolean logTimeSinceLast ) {   
     	def toWrite = ""   
     	if( logTimeSinceLast ) {   
-    		toWrite = message.toString() + " --> "+computeTime()   
+    		toWrite = message.toString() + " --> "+computeTime()
     	} else {   
     		this.tic = System.nanoTime()   
     	}   
@@ -506,7 +535,7 @@ class StitchAndResave {
     }  
        
     def computeTime() {   
-		Duration duration = Duration.ofNanos( System.nanoTime() - this.tic )   
+		Duration duration = Duration.ofNanos( System.nanoTime() - this.tic )
 		return String.format( "%02d:%02d:%02d", duration.toMinutes() % 60 as Integer, duration.getSeconds() % 60 as Integer, duration.getNano() / 1000000 as Integer )   
     }  
 }
