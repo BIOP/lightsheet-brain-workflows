@@ -2,7 +2,7 @@
 
 Code to format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy. 
 
-This repository allows you to process lighsheet data from .czi files through BigStitcher and BrainGlobe's brainreg.
+This repository allows you to process lighsheet data from .czi files through [BigStitcher](https://imagej.net/plugins/bigstitcher/) and BrainGlobe's brainreg.
 
 # About
 The goal of this repository is to build tools to allow for the scalable stitching, fusion and processing of tiled lightsheet data using existing tools.
