@@ -34,3 +34,10 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Java ###
+/.classpath
+/.project
+/.settings/
+/target/
+*.releaseBackup
