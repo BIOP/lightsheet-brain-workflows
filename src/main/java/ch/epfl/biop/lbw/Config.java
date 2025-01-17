@@ -1,6 +1,9 @@
 package ch.epfl.biop.lbw;
 import com.google.gson.GsonBuilder;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.inspector.TagInspector;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +25,8 @@ public class Config {
         HashSet<String> set = new HashSet<>();
         set.add("output dir");
         set.add("input file");
+        set.add("xml file");
+        set.add("docker container name");
         return set;
     }
 
@@ -144,7 +149,12 @@ public class Config {
 
     public static Config loadFromFile(File yamlFile) throws IOException {
         String yamlContent = new String(Files.readAllBytes(yamlFile.toPath()));
-        Yaml yaml = new Yaml();
+        //Yaml yaml = new Yaml();
+        LoaderOptions loaderoptions = new LoaderOptions();
+        TagInspector taginspector =
+                tag -> tag.getClassName().equals(Config.class.getName());
+        loaderoptions.setTagInspector(taginspector);
+        Yaml yaml = new Yaml(new Constructor(Config.class, loaderoptions));
         return yaml.loadAs(yamlContent, Config.class);
     }
 

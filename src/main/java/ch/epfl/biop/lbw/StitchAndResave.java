@@ -1,6 +1,7 @@
 package ch.epfl.biop.lbw;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,28 +9,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import ch.epfl.biop.scijava.command.spimdata.CreateCZIDatasetCommand;
+import ch.epfl.biop.scijava.command.spimdata.FuseBigStitcherDatasetIntoOMETiffCommand;
 import ij.IJ;
 import mpicbg.spim.data.SpimData;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.XmlIoSpimData;
 import mpicbg.spim.data.registration.ViewTransform;
+import org.scijava.Context;
+import org.scijava.command.CommandService;
 
 public class StitchAndResave {
     Config settings;
     int nTiles = 0; // Number of tiles, for "Fix view" during alignment
     List<String> logtrace = new ArrayList<>();
     long tic; // For timing purposes
+    final Context ctx;
 
-    public StitchAndResave( File yamlFile ) throws Exception {
-
+    public StitchAndResave(File yamlFile, Context ctx) throws Exception {
+        this.ctx = ctx;
         this.tic = System.nanoTime();
         settings = Config.loadFromFile(yamlFile);
     }
 
-    public void createBigStitcherDataset() throws SpimDataException {
+    public void createBigStitcherDataset() throws SpimDataException, ExecutionException, InterruptedException {
         // If the XML already exists, remove it, otherwise it will complain
         File bigStitcherXml = new File( settings.bigstitcher.xml_file );
         if( bigStitcherXml.exists() ) {
@@ -43,8 +50,12 @@ public class StitchAndResave {
         // Check if the 'doResaving' flag is set to true, if so, resave in HDF5 format
         if ( settings.bigstitcher.reader.equals("fast") ) {
             addToLog( "INFO: Start Fast reader", false );
-            IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general.input_file + "] erase_if_file_already_exists=true xml_out=["+settings.bigstitcher.xml_file+"]");
-
+            //IJ.run("Make CZI Dataset for BigStitcher", "czi_file=[" + settings.general.input_file + "] erase_if_file_already_exists=true xml_out=["+settings.bigstitcher.xml_file+"]");
+            ctx.getService(CommandService.class)
+                    .run(CreateCZIDatasetCommand.class, true,
+                           "czi_file", fromURI(settings.general.input_file),
+                            "erase_if_file_already_exists", true,
+                            "xml_out", fromURI(settings.bigstitcher.xml_file)).get();
             // Import dataset into bigsticher
             addToLog("INFO: Fast reader DONE", true );
 
@@ -72,11 +83,11 @@ public class StitchAndResave {
 
         // BUGFIX: Change the channel name to be the same as channel ID. Otherwise, we cannot reorient the sample because the channel name is different for the command and we cannot parse that
         addToLog( "Fixing channel names and IDs", false );
-        SpimData dataset = new XmlIoSpimData().load(settings.bigstitcher.xml_file);
+        SpimData dataset = new XmlIoSpimData().load(fromURI(settings.bigstitcher.xml_file));
         dataset.getSequenceDescription().getAllChannels().forEach((id, channel)-> channel.setName(Integer.toString(id)));
 
         // Save it.
-        new XmlIoSpimData().save(dataset, settings.bigstitcher.xml_file);
+        new XmlIoSpimData().save(dataset, fromURI(settings.bigstitcher.xml_file));
 
         // Take advantage of this to get the number of tiles
         this.nTiles = dataset.getSequenceDescription().getAllTilesOrdered().size();
@@ -89,7 +100,7 @@ public class StitchAndResave {
         addToLog("Start channel pairwise alignment", false );
 
         IJ.run("Calculate pairwise shifts ...",
-                "select=[" + settings.bigstitcher.xml_file + "] " +
+                "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                         "process_angle=[All angles] " +
                         "process_channel=[All channels] " +
                         "process_illumination=[All illuminations] " +
@@ -110,13 +121,13 @@ public class StitchAndResave {
         //I ommitted this option as it was giving me errors -> "channels=[use Channel Cam1] " --> This was fixed by Oli
 
 
-        IJ.run("Filter pairwise shifts ...", "select=[" + settings.bigstitcher.xml_file + "] " +
+        IJ.run("Filter pairwise shifts ...", "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                 "filter_by_link_quality " +
                 "min_r=" + settings.bigstitcher.channel_alignment.filter_min_r + " " +
                 "max_r=1");
 
         IJ.run("Optimize globally and apply shifts ...",
-                "select=[" + settings.bigstitcher.xml_file + "] " +
+                "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                         "process_angle=[All angles] " +
                         "process_channel=[All channels] " +
                         "process_illumination=[All illuminations] " +
@@ -142,7 +153,7 @@ public class StitchAndResave {
 
         // Perform Tile alignement
         // Perform pairwise shift calculations
-        String channelAlignString = "select=[" + settings.bigstitcher.xml_file + "] " +
+        String channelAlignString = "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                 "process_angle=[All angles] " +
                 "process_channel=[All channels] " +
                 "process_illumination=[All illuminations] " +
@@ -168,7 +179,7 @@ public class StitchAndResave {
 
         // Filter the pairwise shifts based on certain criteria
 
-        IJ.run("Filter pairwise shifts ...", "select=[" + settings.bigstitcher.xml_file + "] " +
+        IJ.run("Filter pairwise shifts ...", "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                 "filter_by_link_quality " +
                 "min_r=" + settings.bigstitcher.tile_alignment.filter_min_r + " " +
                 "max_r=1");
@@ -180,7 +191,7 @@ public class StitchAndResave {
         String halfTiles = "0-"+ (Math.round( this.nTiles / 2 ));
 
         IJ.run( "Optimize globally and apply shifts ...",
-                "select=[" + settings.bigstitcher.xml_file + "] " +
+                "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                         "process_angle=[All angles] " +
                         "process_channel=[All channels] " +
                         "process_illumination=[All illuminations] " +
@@ -204,7 +215,7 @@ public class StitchAndResave {
         // Perform ICP (Iterative Closest Point) refinement
         addToLog("Start ICP refinement", false );
         IJ.run("ICP Refinement ...",
-                "select=[" + settings.bigstitcher.xml_file + "] " +
+                "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                         "process_angle=[All angles] " +
                         "process_channel=[All channels] " +
                         "process_illumination=[All illuminations] " +
@@ -235,7 +246,7 @@ public class StitchAndResave {
         if ( ASR.t.containsKey(originalOrientation) ) {
             ASR.t.get(originalOrientation).forEach( p -> {
                     // Build the command
-                    String command = "select=["+settings.bigstitcher.xml_file+"] "+
+                    String command = "select=["+toURI(settings.bigstitcher.xml_file)+"] "+
                     "apply_to_angle=[All angles] "+
                     "apply_to_channel=[All channels] "+
                     "apply_to_illumination=[All illuminations] "+
@@ -257,8 +268,8 @@ public class StitchAndResave {
 
             // Otherwise inform that it's not going to be done and mention which transforms are available
         } else {
-            addToLog("We do not have a transformation from '$initialPos'to 'ASR' Skipping reorientation step", false );
-            addToLog("Available Transformations to ASR are from the following orientations ${t.keySet().toString()}", false );
+            addToLog("We do not have a transformation from "+originalOrientation+" to 'ASR' Skipping reorientation step", false );
+            addToLog("Available Transformations to ASR are from the following orientations "+ASR.t.keySet(), false );
             return;
         }
 
@@ -267,7 +278,7 @@ public class StitchAndResave {
 
     }
 
-    void fuseDataset() {
+    void fuseDataset() throws ExecutionException, InterruptedException {
 
         addToLog( "Start data fusion", false );
 
@@ -276,11 +287,28 @@ public class StitchAndResave {
         fusedDirectory.mkdirs();
 
 
-        if( settings.bigstitcher.fusion_config.fusion_type == "fast" ) {
+        if( "fast".equals(settings.bigstitcher.fusion_config.fusion_type) ) {
 
             addToLog( "Fast data fusion", false );
+            // 	at net.preibisch.mvrecon.fiji.plugin.queryXML.GenericLoadParseQueryXML.queryXML(GenericLoadParseQueryXML.java:271)
+            ctx.getService(CommandService.class).run(
+                    FuseBigStitcherDatasetIntoOMETiffCommand.class, true,
+                    "xml_bigstitcher_file", settings.bigstitcher.xml_file,
+                    "output_path_directory", fusedDirectory,
+                    "range_channels", "",
+                    "range_slices", "",
+                    "range_frames", "",
+                    "n_resolution_levels", 1,
+                    "use_lzw_compression", false,
+                    "split_slices", false,
+                    "split_channels", false,
+                    "split_frames", false,
+                    "override_z_ratio", false,
+                    "use_interpolation", false,
+                    "fusion_method", settings.bigstitcher.fusion_config.fusion_method
+            ).get();
 
-            IJ.run("Fuse a BigStitcher dataset to OME-Tiff",
+            /*IJ.run("Fuse a BigStitcher dataset to OME-Tiff",
                     "xml_bigstitcher_file=[" + settings.bigstitcher.xml_file + "] " +
                             "output_path_directory=[" +fusedDirectory+ "] " +
                             "range_channels= " +
@@ -294,14 +322,16 @@ public class StitchAndResave {
                             "override_z_ratio=false " + //false
                             "z_ratio= " + //empty
                             "use_interpolation=false " +
-                            "fusion_method=[" + settings.bigstitcher.fusion_config.fusion_method + "] ");
+                            "fusion_method=[" + settings.bigstitcher.fusion_config.fusion_method + "] ");*/
 
         } else {
 
             addToLog( "Default data fusion", false );
 
-            IJ.run("Fuse dataset ...",
-                    "select=[" + settings.bigstitcher.xml_file + "] " +
+            //IJ.run("Image Fusion", "select=C:/Users/chiarutt/Dropbox/BIOP/lightsheet-brain-workflows/data/out/Axel_Bisi/ExampleBrain/ExampleBrain.xml process_angle=[All angles] process_channel=[All channels] process_illumination=[All illuminations] process_tile=[All tiles] process_timepoint=[All Timepoints] bounding_box=[Currently Selected Views] downsampling=1 interpolation=[Linear Interpolation] fusion_type=[Avg, Blending] pixel_type=[32-bit floating point] interest_points_for_non_rigid=[-= Disable Non-Rigid =-] produce=[Each timepoint & channel] fused_image=[Display using ImageJ] display=[precomputed (fast, complete copy in memory before display)] min_intensity=0 max_intensity=255");
+
+            IJ.run("Image Fusion",//"Fuse dataset ...",
+                    "select=[" + toURI(settings.bigstitcher.xml_file) + "] " +
                             "process_angle=[All angles] " +
                             "process_channel=[All channels] " +
                             "process_illumination=[All illuminations] " +
@@ -323,10 +353,10 @@ public class StitchAndResave {
         addToLog("Data fusion DONE", true);
     }
 
-    void runRegistration2() throws SpimDataException {
+    void runRegistration2() throws SpimDataException, IOException, InterruptedException {
         addToLog( "Getting voxel size for dataset", false );
 
-        SpimData dataset = new XmlIoSpimData().load(settings.bigstitcher.xml_file);
+        SpimData dataset = new XmlIoSpimData().load(fromURI(settings.bigstitcher.xml_file));
 
         Double voxelSize = Arrays.stream(dataset.getSequenceDescription().getViewSetupsOrdered()
                 .get(0).getVoxelSize().dimensionsAsDoubleArray()).min().getAsDouble() * settings.bigstitcher.fusion_config.downsampling;
@@ -366,7 +396,7 @@ public class StitchAndResave {
 
     }
 
-    void runRegistration() throws SpimDataException {
+    void runRegistration() throws SpimDataException, IOException, InterruptedException {
 
         //if( settings.brainreg.atlas_registration == false ) return; ?????????????????????? What the heck ????????????????
 
@@ -392,7 +422,7 @@ public class StitchAndResave {
         }
         IJ.log( extras );*/
 
-        SpimData dataset = new XmlIoSpimData().load(settings.bigstitcher.xml_file);
+        SpimData dataset = new XmlIoSpimData().load(fromURI(settings.bigstitcher.xml_file));
 
         double voxelSize = Arrays.stream(dataset.getSequenceDescription().getViewSetupsOrdered()
                 .get(0).getVoxelSize().dimensionsAsDoubleArray()).min().getAsDouble() * settings.bigstitcher.fusion_config.downsampling;
@@ -440,17 +470,21 @@ public class StitchAndResave {
         }
     }
 
-    void runBrainreg( File input, String outputFolder, double voxelSize, String orientation, String extras ) {
+    void runBrainreg( File input, String outputFolder, double voxelSize, String orientation, String extras ) throws IOException, InterruptedException {
         // Get all parameters from the yaml
         String brainregSettings = Config.BrainReg.getParamsAsString(settings.brainreg.parameters);
 
-        throw new UnsupportedOperationException("Cannot run BrainReg currently - TODO");
+        //throw new UnsupportedOperationException("Cannot run BrainReg currently - TODO");
 
         /*String processString = settings.brainreg.conda_activate_path+" activate  ${settings.brainreg.conda_environement_name} & brainreg \"${input}\" \"${outputFolder}\" -v $voxelSize $voxelSize $voxelSize --orientation $orientation $brainregSettings $extras"
         IJ.log( processString )
         def task = processString.execute()
         task.waitForProcessOutput(System.out, System.err)*/
-
+        ProcessExecutor.executeCondaTask(
+                settings.brainreg.conda_activate_path,
+                settings.brainreg.conda_environement_name,
+                input.getAbsolutePath(), outputFolder, voxelSize,
+                orientation, brainregSettings, extras);
         /*ProcessExecutor.executeCondaTask(
                 // TODO
         );*/
@@ -476,7 +510,7 @@ public class StitchAndResave {
 
         if ( mirrorOrientations.containsKey(orientation) ) {
 
-            SpimData dataset = new XmlIoSpimData().load(settings.bigstitcher.xml_file);
+            SpimData dataset = new XmlIoSpimData().load(fromURI(settings.bigstitcher.xml_file));
 
             // Check transform exists
             // def xml = readXML( settings.bigstitcher.xml_file );
@@ -491,7 +525,7 @@ public class StitchAndResave {
 
             if (!flipTransform.isPresent()) {
 
-                IJ.run( "Apply Transformations", "select=[" + settings.bigstitcher.xml_file + "] "+
+                IJ.run( "Apply Transformations", "select=[" + toURI(settings.bigstitcher.xml_file) + "] "+
                         "apply_to_angle=[All angles] "+
                         "apply_to_channel=[All channels] "+
                         "apply_to_illumination=[All illuminations] "+
@@ -537,5 +571,22 @@ public class StitchAndResave {
     String computeTime() {
         Duration duration = Duration.ofNanos( System.nanoTime() - this.tic );
         return String.format( "%02d:%02d:%02d", duration.toMinutes() % 60, duration.getSeconds() % 60, duration.getNano() / 1000000 );
+    }
+
+    public static String toURI(String in) {
+        if (in.startsWith("file:/")) {
+            return in;
+        } else {
+            System.out.println("file:/"+in.replaceAll("\\\\", "//"));
+            return "file:/"+in.replaceAll("\\\\", "//");
+        }
+    }
+
+    public static String fromURI(String in) {
+        if (in.startsWith("file:/")) {
+            return in.substring(6);
+        } else {
+            return in;
+        }
     }
 }

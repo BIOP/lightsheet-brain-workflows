@@ -16,6 +16,7 @@ public class SimpleIJLaunch {
         final ImageJ ij = new ImageJ();
         ij.ui().showUI();
 
-        ij.command().run(LBWSettingsCreateCommand.class, true).get();
+        //ij.command().run(LBWSettingsCreateCommand.class, true).get();
+        //ij.command().run(LBWStitchAndFuseCommand.class, true).get();
     }
 }

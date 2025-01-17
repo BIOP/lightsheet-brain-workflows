@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>38.0.1</version>
+		<version>40.0.0</version>
 		<relativePath />
 	</parent>
 
@@ -17,7 +17,7 @@
 	<version>0.1.0-SNAPSHOT</version>
 
 	<name>Lightsheet Brain Workflows</name>
-	<description>Format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy</description>
+	<description>Format and preprocess whole-brain cleared brain images acquired with light-sheet fluorescence microscopy</description>
 	<url>https://biop.epfl.ch</url>
 	<inceptionYear>2024</inceptionYear>
 	<organization>
@@ -129,8 +129,13 @@
 		<main-class>ch.epfl.biop.lbw.DummyCommand</main-class>
 		<license.licenseName>MIT</license.licenseName>
 		<license.copyrightOwners>EPFL</license.copyrightOwners>
+		<BigStitcher.version>2.2.1</BigStitcher.version> <!-- 2.0.1 version before imglib2 7 and scijava 39, beware of https://github.com/PreibischLab/BigStitcher/commit/036a1ca5a4a6fbbbde845ea4ec616ff9fc935f1f  -->
 		<!-- <scijava.app.directory>C:/Fiji_template</scijava.app.directory> -->
 		<!-- <scijava.app.subdirectory>plugins/BIOP</scijava.app.subdirectory> -->
+		<bigdataviewer-biop-tools.version>0.11.0</bigdataviewer-biop-tools.version>
+		<spim_data.version>2.3.5</spim_data.version>
+		<multiview-reconstruction.version>4.3.9</multiview-reconstruction.version>
+		<quick-start-czi-reader.version>0.2.5</quick-start-czi-reader.version>
 	</properties>
 
 	<repositories>
@@ -159,25 +164,43 @@
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>spim_data</artifactId>
+			<version>${spim_data.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.epfl.biop</groupId>
+			<artifactId>bigdataviewer-biop-tools</artifactId>
+			<version>${bigdataviewer-biop-tools.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.preibisch</groupId>
+			<artifactId>multiview-reconstruction</artifactId>
+			<version>${multiview-reconstruction.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>net.preibisch</groupId>
+			<artifactId>BigStitcher</artifactId>
+			<version>${BigStitcher.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.groovy</groupId>
-			<artifactId>groovy-xml</artifactId>
-			<!--version>4.0.18</version-->
-			<!--<version>3.0.17</version> <!- Replace with the latest version you want -->
-		</dependency>
-
-		<!--('org.yaml:snakeyaml:2.2')-->
 		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.epfl.biop</groupId>
+			<artifactId>quick-start-czi-reader</artifactId>
+			<version>${quick-start-czi-reader.version}</version>
 			<scope>test</scope>
 		</dependency>
 		

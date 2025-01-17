@@ -513,7 +513,7 @@ public class YamlGUI extends JFrame {
         cziFolders.forEach( path -> {
             File folder = new File(path);
             if(folder.exists()){
-                filesToAnalyse.addAll(FileUtils.listFiles(folder, new String[]{".czi"}, true));
+                filesToAnalyse.addAll(FileUtils.listFiles(folder, new String[]{"czi"}, true));
             } else {
                 messages.add("<p style='color:red;'>The folder '"+folder.getName()+"' doesn't exist ! Cannot save the YAML file.</p>");
             }
@@ -526,14 +526,14 @@ public class YamlGUI extends JFrame {
             File outputDirectory = new File(userAnalysisFolder, imageName);
             outputDirectory.mkdirs();
 
-            File localYamlConfigFile = new File(outputDirectory, "${imageName}_configuration.yml");
+            File localYamlConfigFile = new File(outputDirectory, imageName+"_configuration.yml");
 
             // Prepare the configuration
             yamlConfig.general.input_file = cziFile.toString();
             yamlConfig.general.output_dir = outputDirectory.toString();
 
             // Define the xml already here
-            File bigStitcherXMLFile = new File(outputDirectory, "${imageName}.xml");
+            File bigStitcherXMLFile = new File(outputDirectory, imageName+".xml");
             yamlConfig.bigstitcher.xml_file = bigStitcherXMLFile.toString();
             try {
                 saveYamlToFile(yamlConfig, localYamlConfigFile.getAbsolutePath());

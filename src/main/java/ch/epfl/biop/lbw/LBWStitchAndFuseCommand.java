@@ -1,5 +1,6 @@
 package ch.epfl.biop.lbw;
 
+import org.scijava.Context;
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -34,11 +35,14 @@ public class LBWStitchAndFuseCommand implements Command {
     @Parameter
     LogService log;
 
+    @Parameter
+    Context ctx;
+
     @Override
     public void run() {
         try {
 
-            StitchAndResave resaver = new StitchAndResave( yaml_file );
+            StitchAndResave resaver = new StitchAndResave( yaml_file, ctx );
 
             if ( do_create_dataset ) resaver.createBigStitcherDataset();
 
