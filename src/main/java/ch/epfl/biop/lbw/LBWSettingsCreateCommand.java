@@ -16,7 +16,7 @@ public class LBWSettingsCreateCommand implements Command {
     @Override
     public void run() {
         try {
-            Config config  = Config.loadFromFile(new File("parameters_axel.yml"));
+            Config config  = Config.loadFromFile(base_yaml);
             new YamlGUI().myDialog(config);
         } catch (IOException e) {
             throw new RuntimeException(e);
