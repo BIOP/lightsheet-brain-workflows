@@ -131,9 +131,9 @@ public class Config {
                         try {
                             if (f.get(p) != null) {
                                 if (f.getType().equals(Boolean.class) && ((Boolean) f.get(p))) {
-                                    args.add("--"+f.getName());
+                                    args.add("--"+fixBrainRegArg(f.getName()));
                                 } else {
-                                    args.add("--"+f.getName());
+                                    args.add("--"+fixBrainRegArg(f.getName()));
                                     args.add(f.get(p).toString());
                                 }
                             }
@@ -143,6 +143,35 @@ public class Config {
                     }
             );
             return args.toString();
+        }
+
+        // A fantastic feature: I can't map yaml parameters with minus characters
+        // So I need to fix them, except for brain_geometry which is the only parameter with an underscore
+        /**
+         * usage: brainreg [-h] [-a ADDITIONAL_IMAGES [ADDITIONAL_IMAGES ...]]
+         *                 [--version] [--atlas ATLAS] [--backend BACKEND]
+         *                 [--affine-n-steps AFFINE_N_STEPS]
+         *                 [--affine-use-n-steps AFFINE_USE_N_STEPS]
+         *                 [--freeform-n-steps FREEFORM_N_STEPS]
+         *                 [--freeform-use-n-steps FREEFORM_USE_N_STEPS]
+         *                 [--bending-energy-weight BENDING_ENERGY_WEIGHT]
+         *                 [--grid-spacing GRID_SPACING]
+         *                 [--smoothing-sigma-reference SMOOTHING_SIGMA_REFERENCE]
+         *                 [--smoothing-sigma-floating SMOOTHING_SIGMA_FLOATING]
+         *                 [--histogram-n-bins-floating HISTOGRAM_N_BINS_FLOATING]
+         *                 [--histogram-n-bins-reference HISTOGRAM_N_BINS_REFERENCE] -v
+         *                 VOXEL_SIZES [VOXEL_SIZES ...] --orientation ORIENTATION
+         *                 [--n-free-cpus N_FREE_CPUS] [--debug]
+         *                 [--save-original-orientation]
+         *                 [--brain_geometry {full,hemisphere_l,hemisphere_r}]
+         *                 [--sort-input-file] [--pre-processing PREPROCESSING]
+         *                 image_paths brainreg_directory
+         * @param arg
+         * @return
+         */
+        static String fixBrainRegArg(String arg) {
+            if (arg.equals("brain_geometry")) return arg;
+            return arg.replaceAll("_", "-");
         }
 
     }

@@ -63,30 +63,6 @@ public class ProcessExecutor {
         executeTask(processString);
     }
 
-    /**
-     * Executes a docker run task.
-     *
-     * @param dockerContainerName the Docker container name
-     * @param filePath            the path of the file to process
-     * @param voxelSize           voxel size
-     * @param orientation         orientation
-     * @param extras              additional arguments
-     * @throws IOException          if an I/O error occurs
-     * @throws InterruptedException if the process is interrupted
-     */
-    public static void executeDockerTask(String dockerContainerName, String filePath,
-                                         double voxelSize, String orientation, String extras) throws IOException, InterruptedException {
-        String parentDir = new java.io.File(filePath).getParent();
-        String fileName = new java.io.File(filePath).getName();
-
-        String processString = String.format(
-                "docker run -t -v \"%s\":\"/stitching\" %s brainreg /stitching/%s stitching/registered -v %f %f %f --orientation %s %s",
-                parentDir, dockerContainerName, fileName,
-                voxelSize, voxelSize, voxelSize, orientation, extras
-        );
-        executeTask(processString);
-    }
-
     // Helper class to handle process output
     private static class StreamGobbler implements Runnable {
         private final java.io.InputStream inputStream;
