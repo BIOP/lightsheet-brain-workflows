@@ -29,9 +29,9 @@ You must have a working Fiji installation with the BigStitcher update site enabl
 You can install brainreg and, for example, download the Allen Mouse Brain atlas (barrel-enhanced) at 10um resolution, with the following commands:
 
 ```
-conda create -n brainreg python==3.11 -y
+mamba create -n brainreg python==3.11 -y
 conda activate brainreg
-conda install -y -c conda-forge brainreg
+mamba install -y -c conda-forge brainreg
 brainglobe install -a allen_mouse_bluebrain_barrels_10um
 ```
 
@@ -41,6 +41,8 @@ But this can be done like so, once brainreg is installed.
 ```
 brainglobe install -a allen_mouse_bluebrain_barrels_10um
 ```
+
+NOTE: The atlas are downloaded per user!!
 
 ## Use 
 

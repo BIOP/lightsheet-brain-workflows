@@ -26,6 +26,7 @@ import org.scijava.command.CommandService;
 public class StitchAndResave {
     Config settings;
     int nTiles = 0; // Number of tiles, for "Fix view" during alignment
+    int nChannels = 0;
     List<String> logtrace = new ArrayList<>();
     long tic; // For timing purposes
     final Context ctx;
@@ -91,6 +92,7 @@ public class StitchAndResave {
 
         // Take advantage of this to get the number of tiles
         this.nTiles = dataset.getSequenceDescription().getAllTilesOrdered().size();
+        this.nChannels = dataset.getSequenceDescription().getAllChannels().size();
         addToLog( "INFO: Resaving DONE", true );
 
     }
@@ -256,9 +258,16 @@ public class StitchAndResave {
                     "apply=[Current view transformations (appends to current transforms)] "+
                     "define=[Rotation around axis] "+
                     "same_transformation_for_all_channels "+
-                    "same_transformation_for_all_tiles "+
-                    "axis_timepoint_0_all_channels_illumination_0_angle_0="+p.get("axis")+" "+
-                    "rotation_timepoint_0_all_channels_illumination_0_angle_0="+p.get("angle");
+                    "same_transformation_for_all_tiles ";
+
+                    // UNTESTED WITH MULTIPLE CHANNELS!!
+                    if (nChannels == 1) {
+                        command+="axis_timepoint_0_channel_0_illumination_0_angle_0="+p.get("axis")+" "+
+                                "rotation_timepoint_0_channel_0_illumination_0_angle_0="+p.get("angle");
+                    } else {
+                        command+="axis_timepoint_0_all_channels_illumination_0_angle_0="+p.get("axis")+" "+
+                        "rotation_timepoint_0_all_channels_illumination_0_angle_0="+p.get("angle");
+                    }
 
                 IJ.log( command );
 
