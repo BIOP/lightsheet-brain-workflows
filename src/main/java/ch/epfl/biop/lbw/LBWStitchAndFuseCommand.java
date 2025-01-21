@@ -1,10 +1,12 @@
 package ch.epfl.biop.lbw;
 
+import org.apache.commons.io.FilenameUtils;
 import org.scijava.Context;
 import org.scijava.command.Command;
-import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.task.Task;
+import org.scijava.task.TaskService;
 
 import java.io.File;
 
@@ -33,33 +35,86 @@ public class LBWStitchAndFuseCommand implements Command {
     Boolean do_brain_reg;
 
     @Parameter
-    LogService log;
+    Context ctx;
 
     @Parameter
-    Context ctx;
+    TaskService taskService;
 
     @Override
     public void run() {
-        try {
 
+        Task task = taskService.createTask("Stitch + Fuse "+ FilenameUtils.removeExtension(yaml_file.getName()));
+
+        try {
+            int nTasks = 0;
+            if ( do_create_dataset ) nTasks++;
+            if ( do_channel_alignment ) nTasks++;
+            if ( do_stitch_tiles ) nTasks++;
+            if ( do_asr_reorientation ) nTasks++;
+            if ( do_fusion ) nTasks++;
+            if ( do_brain_reg ) nTasks++;
+
+            int iTask = 0;
+
+            task.setProgressMaximum(nTasks);
+            task.start();
+
+            task.setStatusMessage("Initializes task");
             StitchAndResave resaver = new StitchAndResave( yaml_file, ctx );
 
-            if ( do_create_dataset ) resaver.createBigStitcherDataset();
+            if (task.isCanceled()) return;
 
-            if ( do_channel_alignment ) resaver.alignChannels();
+            if ( do_create_dataset ) {
+                iTask++;
+                task.setProgressValue(iTask);
+                task.setStatusMessage("Create BigStitcher Dataset...");
+                resaver.createBigStitcherDataset();
+            }
 
-            if ( do_stitch_tiles ) resaver.stitchTiles();
+            if (task.isCanceled()) return;
+            if ( do_channel_alignment ) {
+                iTask++;
+                task.setProgressValue(iTask);
+                task.setStatusMessage("Channel alignments...");
+                resaver.alignChannels();
+            }
 
-            if ( do_asr_reorientation ) resaver.toASR( );
+            if (task.isCanceled()) return;
+            if ( do_stitch_tiles ) {
+                iTask++;
+                task.setProgressValue(iTask);
+                task.setStatusMessage("Stitching tiles...");
+                resaver.stitchTiles();
+            }
 
-            if ( do_fusion ) resaver.fuseDataset( );
+            if (task.isCanceled()) return;
+            if ( do_asr_reorientation ) {
+                iTask++;
+                task.setProgressValue(iTask);
+                task.setStatusMessage("Reorient to ASR...");
+                resaver.toASR( );
+            }
 
-            if ( do_brain_reg ) resaver.runRegistration();
+            if (task.isCanceled()) return;
+            if ( do_fusion ) {
+                iTask++;
+                task.setProgressValue(iTask);
+                task.setStatusMessage("Fuse Dataset...");
+                resaver.fuseDataset( );
+            }
+
+            if (task.isCanceled()) return;
+            if ( do_brain_reg ) {
+                iTask++;
+                task.setProgressValue(iTask);
+                task.setStatusMessage("Register with BrainReg...");
+                resaver.runRegistration();
+            }
 
         } catch (Exception e) {
-
             throw new RuntimeException(e);
-
+        } finally {
+            task.finish();
         }
 
     }

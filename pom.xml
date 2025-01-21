@@ -135,7 +135,7 @@
 		<bigdataviewer-biop-tools.version>0.11.0</bigdataviewer-biop-tools.version>
 		<spim_data.version>2.3.5</spim_data.version>
 		<multiview-reconstruction.version>4.3.9</multiview-reconstruction.version>
-		<quick-start-czi-reader.version>0.2.5</quick-start-czi-reader.version>
+		<quick-start-czi-reader.version>0.2.6</quick-start-czi-reader.version>
 	</properties>
 
 	<repositories>
