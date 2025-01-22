@@ -12,26 +12,26 @@ In addition whole-brain fused image stacks are registered to a reference atlas f
 
 ## Installation
 
-### This repo
-
-Download and unzip this repository somewhere e.g. in your `Users/Github` repository.
-
 ### Fiji 
 
-You must have a working Fiji installation with the BigStitcher update site enabled.
-1. Start Fiji and go to Help > Update
-2. Click on "Manage update sites"
-3. Check BigStitcher
-4. Click on Save and close and restart Fiji
+Currently there are compatibility issues with Fiji, thus you need a separate Fiji for this workflow to run.
 
-### brainreg
+1. Download a fresh Fiji from fiji.sc and do not install any update site.
+2. Start Fiji and go to Help > Update
+3. Click on "Manage update sites"
+4. Click on "Add unlisted site"
+5. In the URL of this newly created update site type `https://biop.epfl.ch/Fiji-LBW/`
+6. (optional= You can change the name of the update site (`LBW` for instance) 
+4. Click on `Apply and Close`, then `Apply`, then close and restart Fiji
+
+### Brainreg
 
 You can install brainreg and, for example, download the Allen Mouse Brain atlas (barrel-enhanced) at 10um resolution, with the following commands:
 
 ```
-conda create -n brainreg python==3.11 -y
+mamba create -n brainreg python==3.11 -y
 conda activate brainreg
-conda install -y -c conda-forge brainreg
+mamba install -y -c conda-forge brainreg
 brainglobe install -a allen_mouse_bluebrain_barrels_10um
 ```
 
@@ -42,37 +42,54 @@ But this can be done like so, once brainreg is installed.
 brainglobe install -a allen_mouse_bluebrain_barrels_10um
 ```
 
+### Atlas Location
+
+To avoid all users having the Atlases in their own user profile set the following environment variable
+
+| Environment Variable    | Suggested value                      |
+|-------------------------|--------------------------------------|
+| `BRAINGLOBE_CONFIG_DIR` | `D:\conda\extras\brainglobe-atlases` |
+
+This is based on the protocol suggestions from [our Mamba Conda installation page ](https://wiki-biop.epfl.ch/en/ipa/mamba)
+
 ## Use 
 
 ### Prepare for processing
-1. Make yourself a copy of `parameters_template.yml`, replacing user-specific fields and parameters e.g. `save_dir`, `conda_activate_path`, etc.
-2. From within Fiji, run the script called `YamlGuiCreator.groovy` 
+1. Look for and run `LBW - Open YML Template` in Fiji's search bar, a text editor with the template file will open 
+2. replacing user-specific fields and parameters e.g. `save_dir`, `conda_activate_path`, etc.
+3. Save this file and make sure it has `.yml` extension, for instance `parameters_john.yml`, 
+4. Look for and run `LBW - Create YML Settings From Base File` in Fiji's search bar
 3. You will be prompted for an input .yml file, select your `parameters_<user>.yml` file
 4. On the GUI, fill in the necessary fields as necessary
 	- Under General: Specify your user name and the directory where you would like your processing data to be saved
-	- BigStitcher tab: These are the parameters for stitching and fusing the lighthseet data
+	- BigStitcher tab: These are the parameters for stitching and fusing the lightsheet data
 	**Tip**: for debugging/first try, it is useful to downsample the fused images 8x to quickly check the results.
 	- Brainreg tab: For local usage, specify your conda environment name that you installed using the instructions above. The conda location can be found with `where conda`.
 	**Tip**: 
 		- For optimal registration parameters, leave the default ones. From experience, `grid-spacing` and `bending-energy-weight` seem to matter more.
 		- For debugging, it is useful to register your brains to a lower resolution atlas e.g. 25um, 50um. If all works, then register to higher resolution.
-5. Run tab: Select one or more folders containing CZI files for processing
-6. Click on Save. This will generateone folder per brain .czi file, each contaning a ZYXXX_configuration.yml file where ZYXXX is your mouse name.
+5. Run tab: Select one or more folders containing CZI files for processing (you can also drag on drop folders)
+6. Click on Save. This will generate one folder per brain .czi file, each containing a ZYXXX_configuration.yml file where ZYXXX is the mouse identifier.
 7. Double check the content of these configuration .yml files to make sure all the fields are as desired.
 
-### Run processing
+### Processing
 
-Open the script `Run_stitching_and_fusion.groovy`.
-
-1. Run the script and select a single .yml brain configuration file in your output directory. 
+#### Single brain
+1. Look for and run `LBW - Stitch And Fuse` in Fiji's search bar
+2. Select a single .yml brain configuration file in your output directory. 
 2. Choose which preprocessing steps to perform. Default to all.
 	**Tip**: Useful for troubleshooting/optimizing registration when steps are already performed, select only the steps to repeat.
 
-This will process the entire brain. The log and console windows are useful to check for abnormal preprocessing.
+This will process the entire brain. The log and console windows are useful to check for abnormal preprocessing. 
+You can click on the progress bar located at the bottom right of Fiji's window to get some information about the current running processing step.
 The Fiji editor will display run errors.
 
-**Tip**: While preprocessing (stitching, fusion) can be done in parallel with two Fiji instances opened, atlas registration at high resolution is often limited to one brain at a time.
-
+#### Batch processing
+1. Look for `LBW - Stitch And Fuse` in Fiji's search bar
+2. Press `Batch` instead of `Run`
+3. You can now open or Drag and Drop all the yml file you want to process
+4. Click ok, then select the steps to perform
+5. Each brain will be processed sequentially, there is also a progress bar and the possibility to cancel processing after each brain
 
 ### Downstream analyses of preprocessed brains
 
@@ -84,10 +101,6 @@ After atlas registration using `brainreg`, downstream analyses include can be co
 Other applications that do not involve BrainGlobe's tool are of course also possible, starting from the fused image stacks or from the atlas-registered brain.
 
 BrainGlobe is maintained and evolving, regularly check for updates!
-
-# Cluster usage for batch processing
-
-**Work in progress**.
 
 # Additional information
 
@@ -104,7 +117,7 @@ BrainGlobe is maintained and evolving, regularly check for updates!
 	- The Zeiss microscope acquires images in a mirror view. By default, this flips along the y-axis (vertical) the raw tiles before any reorientation is done. 
 	Therefore, the raw input orientation in the BrainGlobe space is that of the actual acquisition (facing the brain if positioned as the Zeiss camera).
 	For example, the script will convert IAL to ASR (default coronal views). 
-	- Double-check that the re-oriented tiff stack is correct, ask yourself e.g. "should I see fluroescent signal in this hemisphere?".
+	- Double-check that the re-oriented tiff stack is correct, ask yourself e.g. "should I see fluorescent signal in this hemisphere?".
 	
 	
 #### Atlas registration

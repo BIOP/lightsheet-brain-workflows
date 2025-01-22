@@ -1,5 +1,5 @@
 general:
-  user: Olivier Burri
+  user: John Doe
   save_dir: F:\Lightsheet Workflows\analysis
 bigstitcher:
     xml_file: 
@@ -26,7 +26,7 @@ bigstitcher:
     reorientation:
       raw_orientation: IPL
       reorient_to_asr: true # Choose false if you do not want to reorient your sample
-    fusion:
+    fusion_config:
       fusion_type: bigstitcher
       downsampling: 8
       preserve_original: #preserve_original # Or select nothing, especially if you reorient your sample
@@ -41,19 +41,19 @@ brainreg:
     parameters:
         atlas: allen_mouse_25um
         backend: niftyreg
-        affine-n-steps: 6
-        affine-use-n-steps: 5
-        freeform-n-steps: 6
-        freeform-use-n-steps: 4
-        bending-energy-weight: 0.95
-        grid-spacing: -10
-        smoothing-sigma-reference: -1.0
-        smoothing-sigma-floating: -1.0
-        histogram-n-bins-floating: 128
-        histogram-n-bins-reference: 128
-        n-free-cpus: 2
+        affine_n_steps: 6
+        affine_use_n_steps: 5
+        freeform_n_steps: 6
+        freeform_use_n_steps: 4
+        bending_energy_weight: 0.95
+        grid_spacing: -10
+        smoothing_sigma_reference: -1.0
+        smoothing_sigma_floating: -1.0
+        histogram_n_bins_floating: 128
+        histogram_n_bins_reference: 128
+        n_free_cpus: 2
         debug: true
-        save-original-orientation: true
+        save_original_orientation: true
         brain_geometry: full
-        sort-input-file: true
-        pre-processing: default
+        sort_input_file: true
+        pre_processing: default

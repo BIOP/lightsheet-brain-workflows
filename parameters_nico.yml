@@ -1,5 +1,5 @@
 general:
-  user: Axel_Bisi
+  user: Nico
   save_dir: M:\analysis\Axel_Bisi\ImagedBrains
 bigstitcher:
     xml_file: 
@@ -28,7 +28,7 @@ bigstitcher:
       reorient_to_asr: true # Choose false if you do not want to reorient your sample
     fusion_config:
       fusion_type: bigstitcher
-      downsampling: 1
+      downsampling: 4
       preserve_original: #preserve_original # Or select nothing, especially if you reorient your sample
       produce: Each timepoint & channel
       fused_image: Save as (compressed) TIFF stacks

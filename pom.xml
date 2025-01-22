@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>40.0.0</version>
+		<relativePath />
+	</parent>
+
+	<groupId>ch.epfl.biop</groupId>
+	<artifactId>lightsheet-brain-workflows</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+
+	<name>Lightsheet Brain Workflows</name>
+	<description>Format and preprocess whole-brain cleared brain images acquired with light-sheet fluorescence microscopy</description>
+	<url>https://biop.epfl.ch</url>
+	<inceptionYear>2024</inceptionYear>
+	<organization>
+		<name>BIOP</name>
+		<url>https://biop.epfl.ch</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>lorenzotala</id>
+			<name>Lorenzo Talà</name>
+			<url>https://github.com/lorenzotala</url>
+			<roles>
+				<role>founder</role>
+				<role>lead</role>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>abisi</id>
+			<name>Axel Bisi</name>
+			<url>https://github.com/abisi</url>
+			<roles>
+				<role>founder</role>
+				<role>lead</role>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>lacan</id>
+			<name>Olivier Burri</name>
+			<url>https://www.epfl.ch/research/facilities/ptbiop/staff/</url>
+			<roles>
+				<role>developer</role>
+				<role>reviewer</role>
+				<role>support</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>RDornier</id>
+			<name>Rémy Dornier</name>
+			<url>https://www.epfl.ch/research/facilities/ptbiop/staff/</url>
+			<roles>
+				<role>founder</role>
+				<role>lead</role>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+	</developers>
+	<contributors>
+		<contributor>
+			<name>Nicolas Chiaruttini</name>
+			<url>http://biop.epfl.ch/INFO_Facility.html</url>
+			<roles>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
+			<properties><id>NicoKiaru</id></properties>
+		</contributor>
+	</contributors>
+
+	<mailingLists>
+		<mailingList>
+			<name>Image.sc Forum</name>
+			<archive>https://forum.image.sc/</archive>
+		</mailingList>
+	</mailingLists>
+
+	<scm>
+		<connection>scm:git:git:https://github.com/BIOP/lightsheet-brain-workflows</connection>
+		<developerConnection>scm:git:git@github.com:BIOP/lightsheet-brain-workflows</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/BIOP/lightsheet-brain-workflows</url>
+	</scm>
+	
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/BIOP/lightsheet-brain-workflows/issues</url>
+	</issueManagement>
+
+
+	<ciManagement>
+		<system>None</system>
+	</ciManagement>
+
+	<properties>
+		<package-name>ch.epfl.biop.lbw</package-name>
+		<main-class>ch.epfl.biop.lbw.DummyCommand</main-class>
+		<license.licenseName>MIT</license.licenseName>
+		<license.copyrightOwners>EPFL</license.copyrightOwners>
+		<BigStitcher.version>2.2.1</BigStitcher.version> <!-- 2.0.1 version before imglib2 7 and scijava 39, beware of https://github.com/PreibischLab/BigStitcher/commit/036a1ca5a4a6fbbbde845ea4ec616ff9fc935f1f  -->
+		<!-- <scijava.app.directory>C:/Fiji_template</scijava.app.directory> -->
+		<!-- <scijava.app.subdirectory>plugins/BIOP</scijava.app.subdirectory> -->
+		<bigdataviewer-biop-tools.version>0.11.0</bigdataviewer-biop-tools.version>
+		<spim_data.version>2.3.5</spim_data.version>
+		<multiview-reconstruction.version>4.3.9</multiview-reconstruction.version>
+		<quick-start-czi-reader.version>0.2.6</quick-start-czi-reader.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-legacy</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>bigdataviewer-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>sc.fiji</groupId>
+			<artifactId>spim_data</artifactId>
+			<version>${spim_data.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.epfl.biop</groupId>
+			<artifactId>bigdataviewer-biop-tools</artifactId>
+			<version>${bigdataviewer-biop-tools.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.preibisch</groupId>
+			<artifactId>multiview-reconstruction</artifactId>
+			<version>${multiview-reconstruction.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>net.preibisch</groupId>
+			<artifactId>BigStitcher</artifactId>
+			<version>${BigStitcher.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.epfl.biop</groupId>
+			<artifactId>quick-start-czi-reader</artifactId>
+			<version>${quick-start-czi-reader.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+	</dependencies>
+</project>
