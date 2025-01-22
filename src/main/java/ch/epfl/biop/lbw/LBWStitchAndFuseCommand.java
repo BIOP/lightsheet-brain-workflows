@@ -2,6 +2,7 @@ package ch.epfl.biop.lbw;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scijava.Context;
+import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -15,6 +16,9 @@ public class LBWStitchAndFuseCommand implements Command {
 
     @Parameter
     File yaml_file;
+
+    @Parameter(persist = false, required = false, visibility = ItemVisibility.MESSAGE) // that's just a way to force the appearance of the nice multi-folder select window
+    File dummy = null;
 
     @Parameter(label="Create BigStitcher dataset")
     Boolean do_create_dataset;
