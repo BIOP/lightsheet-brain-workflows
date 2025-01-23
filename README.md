@@ -1,6 +1,7 @@
 # Lightsheet Brain Workflows 🔬🧠
 
 Code to format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy. 
+Check out the [BIOP's wiki](https://wiki-biop.epfl.ch/en/whole-brain) for protocols about clearing and image acquisition and related information.
 
 This repository allows you to process lighsheet data from .czi files through [BigStitcher](https://imagej.net/plugins/bigstitcher/) and BrainGlobe's brainreg.
 
