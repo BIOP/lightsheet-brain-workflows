@@ -72,7 +72,11 @@ This is based on the protocol suggestions from [our Mamba Conda installation pag
 6. Click on Save. This will generate one folder per brain .czi file, each containing a ZYXXX_configuration.yml file where ZYXXX is the mouse identifier.
 7. Double check the content of these configuration .yml files to make sure all the fields are as desired.
 
+
 ### Processing
+
+**Note**: For better memory usage, restrict RAM memory used by Fiji during stitching (less memory hungry), to allow for more RAM during registration (more memory hungry). To do so:
+`Edit -> Options -> Memory & Threads... -> Maximum Memory: 40000MB`
 
 #### Single brain
 1. Look for and run `LBW - Stitch And Fuse` in Fiji's search bar
