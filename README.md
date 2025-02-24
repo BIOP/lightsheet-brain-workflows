@@ -33,6 +33,7 @@ You can install brainreg and, for example, download the Allen Mouse Brain atlas 
 mamba create -n brainreg python==3.11 -y
 conda activate brainreg
 mamba install -y -c conda-forge brainreg
+mamba install -y -c conda-forge pytables
 brainglobe install -a allen_mouse_bluebrain_barrels_10um
 ```
 
