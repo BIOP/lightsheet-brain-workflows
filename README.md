@@ -1,6 +1,7 @@
 # Lightsheet Brain Workflows 🔬🧠
 
 Code to format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy. 
+Check out the [BIOP's wiki](https://wiki-biop.epfl.ch/en/whole-brain) for protocols about clearing and image acquisition and related information.
 
 This repository allows you to process lighsheet data from .czi files through [BigStitcher](https://imagej.net/plugins/bigstitcher/) and BrainGlobe's brainreg.
 
@@ -32,7 +33,7 @@ You can install brainreg and, for example, download the Allen Mouse Brain atlas 
 mamba create -n brainreg python==3.11 -y
 conda activate brainreg
 mamba install -y -c conda-forge brainreg
-brainglobe install -a allen_mouse_bluebrain_barrels_10um
+mamba install -y -c conda-forge pytables
 ```
 
 Further documentation about brainreg, atlases and registration parameters can be found in the [BrainGlobe's dedicated documentation](https://brainglobe.info/about.html).
@@ -72,7 +73,11 @@ This is based on the protocol suggestions from [our Mamba Conda installation pag
 6. Click on Save. This will generate one folder per brain .czi file, each containing a ZYXXX_configuration.yml file where ZYXXX is the mouse identifier.
 7. Double check the content of these configuration .yml files to make sure all the fields are as desired.
 
+
 ### Processing
+
+**Note**: For better memory usage, restrict RAM memory used by Fiji during stitching (less memory hungry), to allow for more RAM during registration (more memory hungry). To do so:
+`Edit -> Options -> Memory & Threads... -> Maximum Memory: 40000MB`
 
 #### Single brain
 1. Look for and run `LBW - Stitch And Fuse` in Fiji's search bar
