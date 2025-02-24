@@ -46,7 +46,7 @@ brainreg:
         freeform_n_steps: 6
         freeform_use_n_steps: 4
         bending_energy_weight: 0.8
-        grid_spacing: -8
+        grid_spacing: -20
         smoothing_sigma_reference: -1.0
         smoothing_sigma_floating: -1.0
         histogram_n_bins_floating: 128

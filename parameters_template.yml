@@ -24,11 +24,11 @@ bigstitcher:
       interest: Average Threshold
       icp_max_error: Normal Adjustment (<5px)
     reorientation:
-      raw_orientation: IPL
+      raw_orientation: IAL
       reorient_to_asr: true # Choose false if you do not want to reorient your sample
     fusion_config:
       fusion_type: bigstitcher
-      downsampling: 8
+      downsampling: 1
       preserve_original: #preserve_original # Or select nothing, especially if you reorient your sample
       produce: Each timepoint & channel
       fused_image: Save as (compressed) TIFF stacks
@@ -37,16 +37,16 @@ bigstitcher:
 brainreg:
     docker_container_name:
     conda_environement_name: brainreg
-    conda_activate_path: "C:\\ProgramData\\mambaforge\\condabin\\mamba.bat"
+    conda_activate_path: C:\ProgramData\miniforge3\condabin\conda.bat 
     parameters:
-        atlas: allen_mouse_25um
+        atlas: allen_mouse_bluebrain_barrels_10um
         backend: niftyreg
         affine_n_steps: 6
         affine_use_n_steps: 5
         freeform_n_steps: 6
         freeform_use_n_steps: 4
-        bending_energy_weight: 0.95
-        grid_spacing: -10
+        bending_energy_weight: 0.8
+        grid_spacing: -20
         smoothing_sigma_reference: -1.0
         smoothing_sigma_floating: -1.0
         histogram_n_bins_floating: 128
