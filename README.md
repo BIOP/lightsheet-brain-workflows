@@ -34,7 +34,6 @@ mamba create -n brainreg python==3.11 -y
 conda activate brainreg
 mamba install -y -c conda-forge brainreg
 mamba install -y -c conda-forge pytables
-brainglobe install -a allen_mouse_bluebrain_barrels_10um
 ```
 
 Further documentation about brainreg, atlases and registration parameters can be found in the [BrainGlobe's dedicated documentation](https://brainglobe.info/about.html).
