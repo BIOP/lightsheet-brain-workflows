@@ -506,9 +506,6 @@ public class YamlGUI extends JFrame {
             return messages;
         }
 
-        // Create folder in analysis folder
-        File userAnalysisFolder = new File(analysisFolder, user);
-
         // Simply prepare all the data
         cziFolders.forEach( path -> {
             File folder = new File(path);
@@ -523,7 +520,7 @@ public class YamlGUI extends JFrame {
 
             // Get the required information. Folder with the name of the dataset
             String imageName = FilenameUtils.getBaseName(cziFile.getAbsolutePath());
-            File outputDirectory = new File(userAnalysisFolder, imageName);
+            File outputDirectory = new File(analysisFolder, imageName);
             outputDirectory.mkdirs();
 
             File localYamlConfigFile = new File(outputDirectory, imageName+"_configuration.yml");
