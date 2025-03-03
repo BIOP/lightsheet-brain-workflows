@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/BIOP/lightsheet-brain-workflows/actions/workflows/build.yml/badge.svg)](https://github.com/BIOP/lightsheet-brain-workflows/actions/workflows/build.yml)
+
 # Lightsheet Brain Workflows 🔬🧠
 
 Code to format and preprocess whole-brain cleared brain images acquired with light-sheet fluoresence microscopy. 
