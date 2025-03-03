@@ -127,7 +127,7 @@
 	<properties>
 		<package-name>ch.epfl.biop.lbw</package-name>
 		<main-class>ch.epfl.biop.lbw.DummyCommand</main-class>
-		<license.licenseName>MIT</license.licenseName>
+		<license.licenseName>mit</license.licenseName>
 		<license.copyrightOwners>EPFL</license.copyrightOwners>
 		<BigStitcher.version>2.2.1</BigStitcher.version> <!-- 2.0.1 version before imglib2 7 and scijava 39, beware of https://github.com/PreibischLab/BigStitcher/commit/036a1ca5a4a6fbbbde845ea4ec616ff9fc935f1f  -->
 		<!-- <scijava.app.directory>C:/Fiji_template</scijava.app.directory> -->
