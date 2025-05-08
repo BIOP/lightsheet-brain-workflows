@@ -63,6 +63,9 @@ public class LBWStitchAndFuseCommand implements Command {
     @Parameter(label="Run Brainreg")
     Boolean do_brain_reg;
 
+    @Parameter(label="Quit when done")
+    Boolean force_quit;
+
     @Parameter
     Context ctx;
 
@@ -138,6 +141,12 @@ public class LBWStitchAndFuseCommand implements Command {
                 task.setProgressValue(iTask);
                 task.setStatusMessage("Register with BrainReg...");
                 resaver.runRegistration();
+            }
+
+            if (task.isCanceled()) return;
+
+            if (force_quit) {
+                System.exit(0);
             }
 
         } catch (Exception e) {
