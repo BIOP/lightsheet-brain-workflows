@@ -608,19 +608,10 @@ public class StitchAndResave {
     }
 
     public static String toURI(String in) {
-        if (in.startsWith("file:/")) {
-            return in;
-        } else {
-            System.out.println("file:/"+in.replaceAll("\\\\", "//"));
-            return "file:/"+in.replaceAll("\\\\", "//");
-        }
+        return in;
     }
 
     public static String fromURI(String in) {
-        if (in.startsWith("file:/")) {
-            return in.substring(6);
-        } else {
-            return in;
-        }
+        return in;
     }
 }
