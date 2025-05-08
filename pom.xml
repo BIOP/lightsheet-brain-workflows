@@ -11,7 +11,7 @@
 
 	<groupId>ch.epfl.biop</groupId>
 	<artifactId>lightsheet-brain-workflows</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.1</version>
 
 	<name>Lightsheet Brain Workflows</name>
 	<description>Format and preprocess whole-brain cleared brain images acquired with light-sheet fluorescence microscopy</description>
@@ -107,7 +107,7 @@
 	<scm>
 		<connection>scm:git:git:https://github.com/BIOP/lightsheet-brain-workflows</connection>
 		<developerConnection>scm:git:git@github.com:BIOP/lightsheet-brain-workflows</developerConnection>
-		<tag>HEAD</tag>
+		<tag>lightsheet-brain-workflows-0.1.1</tag>
 		<url>https://github.com/BIOP/lightsheet-brain-workflows</url>
 	</scm>
 	
