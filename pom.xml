@@ -129,7 +129,7 @@
 		<BigStitcher.version>2.2.1</BigStitcher.version> <!-- 2.0.1 version before imglib2 7 and scijava 39, beware of https://github.com/PreibischLab/BigStitcher/commit/036a1ca5a4a6fbbbde845ea4ec616ff9fc935f1f  -->
 		<!-- <scijava.app.directory>C:/Fiji_template</scijava.app.directory> -->
 		<!-- <scijava.app.subdirectory>plugins/BIOP</scijava.app.subdirectory> -->
-		<bigdataviewer-biop-tools.version>0.11.1</bigdataviewer-biop-tools.version>
+		<bigdataviewer-biop-tools.version>0.12.0</bigdataviewer-biop-tools.version>
 		<spim_data.version>2.3.5</spim_data.version>
 		<multiview-reconstruction.version>4.3.9</multiview-reconstruction.version>
 		<quick-start-czi-reader.version>0.2.6</quick-start-czi-reader.version>

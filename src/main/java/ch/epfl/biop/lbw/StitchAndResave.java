@@ -339,6 +339,9 @@ public class StitchAndResave {
                     "split_frames", false,
                     "override_z_ratio", false,
                     "use_interpolation", false,
+                    "x_downsample", settings.bigstitcher.fusion_config.downsampling,
+                    "y_downsample", settings.bigstitcher.fusion_config.downsampling,
+                    "z_downsample", settings.bigstitcher.fusion_config.downsampling,
                     "fusion_method", settings.bigstitcher.fusion_config.fusion_method
             ).get();
 
