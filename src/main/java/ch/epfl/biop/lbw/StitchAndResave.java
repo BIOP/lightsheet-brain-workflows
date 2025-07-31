@@ -436,26 +436,6 @@ public class StitchAndResave {
 
         addToLog( "Getting voxel size for dataset", false );
 
-        //def xml = readXML( settings.bigstitcher.xml_file );
-        /*def voxelSize = Double.parseDouble( xml.SequenceDescription.ViewSetups.ViewSetup[0].voxelSize.size.text().split(" ").min()) * settings.bigstitcher.fusion.downsampling
-
-        // Number of channels
-        def nC = xml.SequenceDescription.ViewSetups.Attributes.findAll{ it.@name == "channel" }.Channel.size()
-
-        def fusedDirectory = new File( settings.general.output_dir + "/" + settings.bigstitcher.fusion.fuse_dir )
-        def imageName = new File( settings.general.input_file ).getName()
-        // Make a folder for the registration and place the tiff file sequence in it
-        // Get the filename
-
-        def fileNames = (0..(nC-1)).collect{ new File( fusedDirectory, imageName + "_fused_tp_0_ch_${it}.tif") }
-
-        def extras = ""
-        // Append extra channels
-        if( fileNames.size() > 1 ) {
-            extras = "-a " + fileNames.collect{ "\"$it\"" }.join(" ")
-        }
-        IJ.log( extras );*/
-
         SpimData dataset = new XmlIoSpimData().load(fromURI(settings.bigstitcher.xml_file));
 
         double voxelSize = Arrays.stream(dataset.getSequenceDescription().getViewSetupsOrdered()
@@ -491,7 +471,7 @@ public class StitchAndResave {
             orientation = settings.bigstitcher.reorientation.raw_orientation.toLowerCase();
         }
 
-        if (settings.brainreg.conda_environement_name != null ) {
+        if ((settings.brainreg.conda_environement_name != null) || (settings.brainreg.venv_path != null)) {
             runBrainreg(fileNames.get(0), fileNames.get(0).getParent()+"/registered", voxelSize, orientation, extras );
         } else {
             throw new UnsupportedOperationException("Cannot run docker currently");
@@ -514,11 +494,23 @@ public class StitchAndResave {
         IJ.log( processString )
         def task = processString.execute()
         task.waitForProcessOutput(System.out, System.err)*/
-        ProcessExecutor.executeCondaTask(
-                settings.brainreg.conda_activate_path,
-                settings.brainreg.conda_environement_name,
-                input.getAbsolutePath(), outputFolder, voxelSize,
-                orientation, brainregSettings, extras);
+
+        if ((settings.brainreg.venv_path == null) || settings.brainreg.venv_path.isEmpty()) {
+            ProcessExecutor.executeCondaTask(
+                    settings.brainreg.conda_activate_path,
+                    settings.brainreg.conda_environement_name,
+                    input.getAbsolutePath(), outputFolder, voxelSize,
+                    orientation, brainregSettings, extras);
+        } else {
+            ProcessExecutor.executeVenvTask(
+                    settings.brainreg.venv_path,
+                    input.getAbsolutePath(), outputFolder, voxelSize,
+                    orientation, brainregSettings, extras);
+        }
+
+
+
+
         /*ProcessExecutor.executeCondaTask(
                 // TODO
         );*/
@@ -556,7 +548,7 @@ public class StitchAndResave {
             //def flipTansform = xml.ViewRegistrations.ViewRegistration[0].ViewTransform.find{ it.Name.text().contains("Manually defined transformation (Rigid/Affine by matrix)") }
 
             addToLog( "INFO: Flipping along X axis", false );
-
+            //FuseBigStitcherDatasetIntoOMETiffCommand
             if (!flipTransform.isPresent()) {
 
                 IJ.run( "Apply Transformations", "select=[" + toURI(settings.bigstitcher.xml_file) + "] "+

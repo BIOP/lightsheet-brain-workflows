@@ -124,6 +124,7 @@ public class Config {
 
     public static class BrainReg {
         public String docker_container_name;
+        public String venv_path;
         public String conda_environement_name;
         public String conda_activate_path;
         public Parameters parameters;
