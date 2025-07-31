@@ -17,43 +17,16 @@ In addition whole-brain fused image stacks are registered to a reference atlas f
 
 ### Fiji 
 
-Currently there are compatibility issues with Fiji, thus you need a separate Fiji for this workflow to run.
-
-1. Download a fresh Fiji from fiji.sc and do not install any update site.
+1. Download a fresh Fiji from fiji.sc 
 2. Start Fiji and go to Help > Update
 3. Click on "Manage update sites"
-4. Click on "Add unlisted site"
-5. In the URL of this newly created update site type `https://biop.epfl.ch/Fiji-LBW/`
-6. (optional= You can change the name of the update site (`LBW` for instance) 
+4. Add the PTBIOP update site
 4. Click on `Apply and Close`, then `Apply`, then close and restart Fiji
 
-### Brainreg
+### BrainReg
 
-You can install brainreg and, for example, download the Allen Mouse Brain atlas (barrel-enhanced) at 10um resolution, with the following commands:
-
-```
-mamba create -n brainreg python==3.11 -y
-conda activate brainreg
-mamba install -y -c conda-forge brainreg
-mamba install -y -c conda-forge pytables
-```
-
-Further documentation about brainreg, atlases and registration parameters can be found in the [BrainGlobe's dedicated documentation](https://brainglobe.info/about.html).
-Any atlas unavailable locally will be downloaded upon first call, so there is no need to pre-download atlases. 
-But this can be done like so, once brainreg is installed.
-```
-brainglobe install -a allen_mouse_bluebrain_barrels_10um
-```
-
-### Atlas Location
-
-To avoid all users having the Atlases in their own user profile set the following environment variable
-
-| Environment Variable    | Suggested value                      |
-|-------------------------|--------------------------------------|
-| `BRAINGLOBE_CONFIG_DIR` | `D:\conda\extras\brainglobe-atlases` |
-
-This is based on the protocol suggestions from [our Mamba Conda installation page ](https://wiki-biop.epfl.ch/en/ipa/mamba)
+Please check the instructions in
+ [our Mamba Conda installation page ](https://wiki-biop.epfl.ch/en/ipa/mamba) regarding the BrainReg environment.
 
 ## Use 
 
