@@ -18,10 +18,12 @@ In addition whole-brain fused image stacks are registered to a reference atlas f
 ### Fiji 
 
 1. Download a fresh Fiji from fiji.sc 
-2. Start Fiji and go to Help > Update
+2. Start Fiji and go to `Help > Update...`
 3. Click on "Manage update sites"
-4. Add the PTBIOP update site
+4. Add the `PTBIOP` update site
 4. Click on `Apply and Close`, then `Apply`, then close and restart Fiji
+
+To use the fast CZI reader, add the following update site: `Zeiss Quick Start Reader`
 
 ### BrainReg
 
